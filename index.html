@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: white;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000;
+    }
+
+    .fundraiser {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 25px;
+      text-align: center;
+    }
+
+    .label {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .amount {
+      font-size: clamp(48px, 10vw, 90px);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .goal {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+
+    .bar {
+      width: 100%;
+      height: 26px;
+      background: #eeeeee;
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #829985;
+      border-radius: 50px;
+      transition: width 0.8s ease;
+    }
+
+    .percent {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fundraiser">
+
+    <div class="label">
+      VYBRÁNO PRO MÁMY V KÁŠI
+    </div>
+
+    <div class="amount" id="amount">
+      0 Kč
+    </div>
+
+    <div class="goal">
+      z cílových 500 000 Kč
+    </div>
+
+    <div class="bar">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="percent" id="percent">
+      0 %
+    </div>
+
+  </div>
+
+  <script>
+    const goal = 500000;
+
+    // Zatím 0 Kč.
+    // Sem později napojíme data transparentního účtu ČSOB.
+    const raised = 0;
+
+    const percentage = Math.min((raised / goal) * 100, 100);
+
+    document.getElementById("amount").textContent =
+      raised.toLocaleString("cs-CZ") + " Kč";
+
+    document.getElementById("progress").style.width =
+      percentage + "%";
+
+    document.getElementById("percent").textContent =
+      Math.round(percentage) + " %";
+  </script>
+
+</body>
+</html>
