@@ -1,191 +1,166 @@
-name: Aktualizovat vybranou castku
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"
+  <title>Adéla běží 111 km za mámy samoživitelky</title>
 
-permissions:
-  contents: write
+  <meta
+    name="description"
+    content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí."
+  >
 
-jobs:
-  update:
-    runs-on: ubuntu-latest
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    steps:
-      - name: Stahnout repozitar
-        uses: actions/checkout@v4
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #111;
+    }
 
-      - name: Nainstalovat requests
-        run: python -m pip install requests
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-      - name: Spocitat prijate dary
-        shell: python
-        run: |
-          import json
-          import requests
-          from datetime import datetime, timezone
+    main {
+      width: 100%;
+      max-width: 1366px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #fff;
+    }
 
-          PAGE_URL = "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
-          API_URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
+    .canva {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+    }
 
-          ACCOUNT = 377658515
-          START_DATE = "2026-09-30"
-          GOAL = 500000
+    .counter {
+      padding: 55px 20px 60px;
+      text-align: center;
+      background: #fff;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
 
-          today = datetime.now(timezone.utc).date().isoformat()
+    .counter h2 {
+      margin: 0 0 14px;
+      font-size: clamp(22px, 3vw, 38px);
+    }
 
-          session = requests.Session()
+    .amount {
+      margin: 0;
+      font-size: clamp(44px, 8vw, 92px);
+      font-weight: 800;
+      line-height: 1;
+    }
 
-          browser_headers = {
-              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
-              "Accept-Language": "cs-CZ,cs;q=0.9"
+    .note {
+      margin-top: 14px;
+      margin-bottom: 0;
+      font-size: 15px;
+    }
+
+    @media (min-width: 1500px) {
+      main {
+        max-width: 1800px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main>
+
+    <img
+      class="canva"
+      src="page-1.png"
+      alt="Adéla běží 111 km za mámy samoživitelky"
+    >
+
+    <img
+      class="canva"
+      src="page-2.png"
+      alt="O projektu"
+    >
+
+    <img
+      class="canva"
+      src="page-3.png"
+      alt="Proč pomáhat maminkám samoživitelkám"
+    >
+
+    <section class="counter" aria-label="Vybraná částka">
+
+      <h2>Společně jsme zatím vybrali</h2>
+
+      <div class="amount">
+        <span id="amount">0</span> Kč
+      </div>
+
+      <p class="note">Děkuju za každou pomoc. &lt;3</p>
+
+    </section>
+
+    <img
+      class="canva"
+      src="page-4.png"
+      alt="Nadační fond MÁMY V KAŠI"
+    >
+
+  </main>
+
+  <script>
+    async function updateAmount() {
+      try {
+
+        const response = await fetch(
+          "amount.json?time=" + Date.now(),
+          {
+            cache: "no-store"
           }
+        );
 
-          print("Oteviram verejnou stranku CSOB...")
+        if (!response.ok) {
+          throw new Error("Nepodařilo se načíst amount.json");
+        }
 
-          page_response = session.get(
-              PAGE_URL,
-              headers=browser_headers,
-              timeout=30,
-              allow_redirects=True
-          )
+        const data = await response.json();
 
-          page_response.raise_for_status()
+        const value =
+          data.raised ??
+          data.amount ??
+          data.value ??
+          data.total ??
+          0;
 
-          print("Stranka CSOB:", page_response.status_code)
-          print("Cookies:", len(session.cookies))
+        document.getElementById("amount").textContent =
+          Number(value).toLocaleString("cs-CZ");
 
-          api_headers = {
-              "Accept": "application/json, text/plain, */*",
-              "Content-Type": "application/json",
-              "User-Agent": browser_headers["User-Agent"],
-              "Accept-Language": "cs-CZ,cs;q=0.9",
-              "Origin": "https://www.csob.cz",
-              "Referer": PAGE_URL,
-              "X-Security-Request": "required"
-          }
+      } catch (error) {
 
-          raised = 0.0
-          page = 1
+        console.error(
+          "Chyba při načítání částky:",
+          error
+        );
 
-          while True:
-              payload = {
-                  "accountList": [
-                      {
-                          "accountNumberM24": ACCOUNT
-                      }
-                  ],
-                  "filterList": [
-                      {
-                          "name": "AccountingDate",
-                          "operator": "ge",
-                          "valueList": [START_DATE]
-                      },
-                      {
-                          "name": "AccountingDate",
-                          "operator": "le",
-                          "valueList": [today]
-                      }
-                  ],
-                  "paging": {
-                      "rowsPerPage": 100,
-                      "pageNumber": page
-                  },
-                  "sortList": [
-                      {
-                          "name": "AccountingDate",
-                          "direction": "DESC",
-                          "order": 1
-                      }
-                  ]
-              }
+        document.getElementById("amount").textContent = "—";
+      }
+    }
 
-              print("Nacitam stranu:", page)
+    updateAmount();
 
-              response = session.post(
-                  API_URL,
-                  json=payload,
-                  headers=api_headers,
-                  timeout=30,
-                  allow_redirects=True
-              )
+    setInterval(updateAmount, 60000);
+  </script>
 
-              print("HTTP:", response.status_code)
-              print("Finalni URL:", response.url)
-
-              response.raise_for_status()
-
-              result = response.json()
-
-              transactions = result.get(
-                  "accountedTransaction",
-                  []
-              )
-
-              for transaction in transactions:
-                  base_info = transaction.get(
-                      "baseInfo",
-                      {}
-                  )
-
-                  amount_data = base_info.get(
-                      "accountAmountData",
-                      {}
-                  )
-
-                  amount = float(
-                      amount_data.get("amount", 0) or 0
-                  )
-
-                  currency = amount_data.get(
-                      "currencyCode"
-                  )
-
-                  if amount > 0 and currency == "CZK":
-                      raised += amount
-
-              paging = result.get("paging", {})
-
-              page_count = int(
-                  paging.get("pageCount", 1) or 1
-              )
-
-              if page >= page_count:
-                  break
-
-              page += 1
-
-          output = {
-              "raised": round(raised, 2),
-              "goal": GOAL
-          }
-
-          with open(
-              "amount.json",
-              "w",
-              encoding="utf-8"
-          ) as file:
-              json.dump(
-                  output,
-                  file,
-                  ensure_ascii=False,
-                  indent=2
-              )
-              file.write("\n")
-
-          print("HOTOVO:", output)
-
-      - name: Ulozit novou castku
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add amount.json
-
-          if git diff --cached --quiet; then
-            echo "Castka se nezmenila."
-          else
-            git commit -m "Aktualizace vybrane castky"
-            git push
-          fi
+</body>
+</html>
