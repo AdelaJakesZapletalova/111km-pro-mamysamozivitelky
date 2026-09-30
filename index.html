@@ -69,16 +69,43 @@
     }
 
 
+    /* TŘETÍ STRÁNKA */
+
+    .page-three {
+      position: relative;
+      width: 100%;
+    }
+
+
+    /*
+      NEVIDITELNÝ BOD U QR KÓDU
+      TLAČÍTKO CHCI PŘISPĚT SJÍŽDÍ SEM
+    */
+
+    .donate-target {
+      position: absolute;
+      top: 82%;
+      left: 0;
+
+      width: 1px;
+      height: 1px;
+
+      pointer-events: none;
+    }
+
+
     /* POČÍTADLO */
 
     .counter {
       position: absolute;
 
+      /* POZICE POČÍTADLA */
       top: calc(15% + 2cm);
       left: calc(50% + 1cm);
 
       width: 31%;
 
+      /* CELÉ POČÍTADLO O 15 % VĚTŠÍ */
       transform: translate(-50%, -50%) scale(1.15);
       transform-origin: center center;
 
@@ -88,6 +115,8 @@
       color: #C68BFF !important;
     }
 
+
+    /* NADPIS */
 
     .counter h2 {
       margin: 0 0 12px 0;
@@ -103,6 +132,8 @@
     }
 
 
+    /* ČÁSTKA */
+
     .counter .amount {
       margin: 0;
       padding: 0;
@@ -114,6 +145,8 @@
       line-height: 1;
     }
 
+
+    /* PROCENTA */
 
     .counter .percentage {
       margin: 14px 0 0 0;
@@ -216,6 +249,7 @@
       background: #fff;
     }
 
+
     .route-map iframe {
       display: block;
 
@@ -243,19 +277,23 @@
         transform-origin: center center;
       }
 
+
       .counter h2 {
         margin-bottom: 6px;
         font-size: clamp(10px, 2.1vw, 18px);
       }
 
+
       .counter .amount {
         font-size: clamp(27px, 6vw, 50px);
       }
+
 
       .counter .percentage {
         margin-top: 7px;
         font-size: clamp(7px, 1.7vw, 13px);
       }
+
 
       .counter .progress {
         height: 12px;
@@ -305,7 +343,7 @@
   <a
     class="donate-button"
     href="#prispet"
-    aria-label="Přejít k možnostem příspěvku"
+    aria-label="Přejít přímo k QR kódu a možnostem příspěvku"
   >
     CHCI PŘISPĚT
   </a>
@@ -389,12 +427,9 @@
 
 
 
-    <!-- STRÁNKA 3 / QR + ÚČET -->
+    <!-- STRÁNKA 3 -->
 
-    <div
-      class="page"
-      id="prispet"
-    >
+    <div class="page page-three">
 
       <img
         class="canva"
@@ -403,6 +438,15 @@
         loading="lazy"
         decoding="async"
       >
+
+
+      <!-- BOD PŘÍMO U QR KÓDU -->
+
+      <div
+        id="prispet"
+        class="donate-target"
+        aria-hidden="true"
+      ></div>
 
     </div>
 
