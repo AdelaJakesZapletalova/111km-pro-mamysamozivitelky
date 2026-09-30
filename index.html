@@ -63,9 +63,9 @@
     .counter {
       position: absolute;
 
-      /* 1 CM DOPRAVA + 2 CM DOLŮ */
+      /* POZICE POČÍTADLA */
       top: calc(15% + 2cm);
-      left: calc(50% + 2cm);
+      left: calc(50% + 1cm);
 
       width: 31%;
 
@@ -440,6 +440,8 @@
 
     updateAmount();
 
+
+    /* WEB KONTROLUJE NOVOU ČÁSTKU KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
