@@ -34,6 +34,13 @@
       overflow: hidden;
     }
 
+    .page {
+      position: relative;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
     .canva {
       display: block;
       width: 100%;
@@ -42,29 +49,29 @@
       padding: 0;
     }
 
-    /* DRUHÁ STRÁNKA */
+    /* Druhá stránka – počítadlo je vložené do volného místa */
     .page-two {
       position: relative;
       width: 100%;
     }
 
-    /* POČÍTADLO */
     .counter {
       position: absolute;
 
-      /* POZICI NECHÁVÁME */
+      /* výška počítadla na stránce */
       top: 6%;
-      left: 50%;
-      transform: translate(-50%, -50%);
 
-      width: 58%;
+      left: 50%;
+      transform: translateX(-50%);
+
+      width: 70%;
       text-align: center;
       z-index: 10;
       color: #111;
     }
 
     .counter h2 {
-      margin: 0 0 7px;
+      margin: 0 0 8px;
       font-size: clamp(18px, 2.5vw, 34px);
       font-weight: 700;
     }
@@ -76,77 +83,58 @@
       line-height: 1;
     }
 
-    /* PROCENTA A CÍL */
     .percentage {
-      margin-top: 14px;
+      margin: 12px 0 0;
       font-size: clamp(14px, 1.5vw, 21px);
       font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
     }
 
-    /* PROGRESS BAR */
+    /* Užší obdélník uprostřed */
     .progress {
       position: relative;
       display: block;
-
-      width: 100%;
-      height: 28px;
-
+      width: 55%;
+      height: 24px;
       margin: 12px auto 0;
-
       border: 3px solid #111;
-      background: rgba(255,255,255,0.95);
-
+      background: #fff;
       overflow: hidden;
     }
 
     .progress-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-
       height: 100%;
       width: 0%;
-
-      background:
-        repeating-linear-gradient(
-          -45deg,
-          #111 0px,
-          #111 12px,
-          #555 12px,
-          #555 24px
-        );
-
-      transition: width 0.8s ease;
+      background: #111;
+      transition: width 0.6s ease;
     }
 
     @media (max-width: 700px) {
-
       .counter {
-        width: 72%;
+        width: 75%;
       }
 
       .counter h2 {
-        font-size: 16px;
+        font-size: clamp(15px, 3vw, 24px);
       }
 
       .amount {
-        font-size: 42px;
+        font-size: clamp(36px, 8vw, 65px);
       }
 
       .percentage {
-        margin-top: 8px;
-        font-size: 13px;
+        font-size: clamp(11px, 2.2vw, 16px);
       }
 
       .progress {
+        width: 60%;
         height: 18px;
-        margin-top: 8px;
         border-width: 2px;
       }
     }
 
     @media (min-width: 1500px) {
-
       main {
         max-width: 1800px;
         margin: auto;
@@ -155,21 +143,21 @@
   </style>
 </head>
 
-
 <body>
 
   <main>
 
     <!-- STRÁNKA 1 -->
-    <img
-      class="canva"
-      src="page-1.png"
-      alt="Adéla běží 111 km za mámy samoživitelky"
-    >
-
+    <div class="page">
+      <img
+        class="canva"
+        src="page-1.png"
+        alt="Adéla běží 111 km za mámy samoživitelky"
+      >
+    </div>
 
     <!-- STRÁNKA 2 -->
-    <div class="page-two">
+    <div class="page page-two">
 
       <img
         class="canva"
@@ -177,14 +165,9 @@
         alt="O projektu"
       >
 
-      <section
-        class="counter"
-        aria-label="Stav sbírky"
-      >
+      <div class="counter">
 
-        <h2>
-          Společně jsme zatím vybrali
-        </h2>
+        <h2>Společně jsme zatím vybrali</h2>
 
         <div
           class="amount"
@@ -200,47 +183,42 @@
           0 % z cílových 500 000 Kč
         </div>
 
-        <div
-          class="progress"
-          aria-label="Průběh sbírky"
-        >
+        <div class="progress">
           <div
             class="progress-fill"
             id="progress-fill"
           ></div>
         </div>
 
-      </section>
+      </div>
 
     </div>
 
-
     <!-- STRÁNKA 3 -->
-    <img
-      class="canva"
-      src="page-3.png"
-      alt="Proč pomáhat maminkám samoživitelkám"
-    >
-
+    <div class="page">
+      <img
+        class="canva"
+        src="page-3.png"
+        alt="Proč pomáhat"
+      >
+    </div>
 
     <!-- STRÁNKA 4 -->
-    <img
-      class="canva"
-      src="page-4.png"
-      alt="Nadační fond Mámy v kaši"
-    >
+    <div class="page">
+      <img
+        class="canva"
+        src="page-4.png"
+        alt="Nadační fond Mámy v kaši"
+      >
+    </div>
 
   </main>
 
-
   <script>
-
     async function updateAmount() {
-
       try {
-
         const response = await fetch(
-          "amount.json?t=" + Date.now(),
+          "amount.json?time=" + Date.now(),
           {
             cache: "no-store"
           }
@@ -252,116 +230,59 @@
 
         const data = await response.json();
 
-        const raised =
-          Number(data.raised) || 0;
-
-        const goal =
-          Number(data.goal) || 500000;
-
-
-        /* ČÁSTKA */
-
-        document.getElementById("amount").textContent =
-          new Intl.NumberFormat(
-            "cs-CZ",
-            {
-              maximumFractionDigits: 0
-            }
-          ).format(raised)
-          + " Kč";
-
-
-        /* PROCENTA */
+        const raised = Number(data.raised) || 0;
+        const goal = Number(data.goal) || 500000;
 
         const percentage =
           goal > 0
             ? (raised / goal) * 100
             : 0;
 
+        document.getElementById("amount").textContent =
+          raised.toLocaleString("cs-CZ", {
+            maximumFractionDigits: 0
+          }) + " Kč";
 
         let percentageText;
 
-        if (percentage < 1) {
-
-          percentageText =
-            percentage.toLocaleString(
-              "cs-CZ",
-              {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              }
-            );
-
+        if (percentage > 0 && percentage < 0.01) {
+          percentageText = "< 0,01";
         } else {
-
           percentageText =
-            percentage.toLocaleString(
-              "cs-CZ",
-              {
-                maximumFractionDigits: 1
-              }
-            );
-
+            percentage.toLocaleString("cs-CZ", {
+              minimumFractionDigits: percentage < 1 ? 2 : 0,
+              maximumFractionDigits: 2
+            });
         }
 
-
-        /* PROCENTA + CÍL */
-
-        document.getElementById(
-          "percentage"
-        ).textContent =
+        document.getElementById("percentage").textContent =
           percentageText +
           " % z cílových " +
-          new Intl.NumberFormat(
-            "cs-CZ",
-            {
-              maximumFractionDigits: 0
-            }
-          ).format(goal) +
+          goal.toLocaleString("cs-CZ") +
           " Kč";
 
-
-        /* PROGRESS BAR */
-
+        /*
+          Graf se při částce nad cílem zastaví vizuálně na 100 %,
+          ale skutečná částka nahoře se dál normálně zobrazuje.
+        */
         const barPercentage =
-          Math.min(
-            Math.max(percentage, 0),
-            100
-          );
+          Math.min(percentage, 100);
 
-
-        document.getElementById(
-          "progress-fill"
-        ).style.width =
+        document.getElementById("progress-fill").style.width =
           barPercentage + "%";
 
-
       } catch (error) {
-
-        console.error(error);
-
-        document.getElementById(
-          "amount"
-        ).textContent = "— Kč";
-
-        document.getElementById(
-          "percentage"
-        ).textContent =
-          "Cíl 500 000 Kč";
-
+        console.error(
+          "Chyba při načítání částky:",
+          error
+        );
       }
-
     }
-
 
     updateAmount();
 
-    /* aktualizace každou minutu */
-    setInterval(
-      updateAmount,
-      60000
-    );
-
+    /* kontrola nové částky každou minutu */
+    setInterval(updateAmount, 60000);
   </script>
 
 </body>
