@@ -12,7 +12,6 @@
     content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí."
   >
 
-  <!-- První Canva stránka má nejvyšší prioritu -->
   <link
     rel="preload"
     as="image"
@@ -57,26 +56,16 @@
       padding: 0;
     }
 
-
-    /* DRUHÁ STRÁNKA */
-
     .page-two {
       position: relative;
       width: 100%;
     }
-
-
-    /* TŘETÍ A ČTVRTÁ STRÁNKA
-       Prohlížeč nemusí hned vykreslovat obsah,
-       který je hluboko pod obrazovkou.
-    */
 
     .page-three,
     .page-four {
       content-visibility: auto;
       contain-intrinsic-size: auto 2000px;
     }
-
 
     .page-three {
       position: relative;
@@ -103,7 +92,6 @@
       color: #C68BFF !important;
     }
 
-
     .counter h2 {
       margin: 0 0 12px 0;
       padding: 0;
@@ -117,7 +105,6 @@
       white-space: nowrap;
     }
 
-
     .counter .amount {
       margin: 0;
       padding: 0;
@@ -128,7 +115,6 @@
       font-weight: 800;
       line-height: 1;
     }
-
 
     .counter .percentage {
       margin: 14px 0 0 0;
@@ -143,9 +129,6 @@
       text-align: center;
       white-space: nowrap;
     }
-
-
-    /* PROGRESS BAR */
 
     .counter .progress {
       position: relative;
@@ -162,7 +145,6 @@
       overflow: hidden;
     }
 
-
     .counter .progress-fill {
       display: block;
 
@@ -175,7 +157,23 @@
     }
 
 
-    /* CHCI PŘISPĚT - VPRAVO DOLE */
+    /* INFORMACE O AKTUALIZACI ČÁSTKY */
+
+    .counter .update-info {
+      margin-top: 8px;
+
+      color: #C68BFF !important;
+
+      font-size: clamp(10px, 1vw, 15px);
+      font-weight: 600;
+      line-height: 1.2;
+
+      text-align: center;
+      white-space: nowrap;
+    }
+
+
+    /* CHCI PŘISPĚT */
 
     .donate-button {
       position: fixed;
@@ -212,7 +210,6 @@
         box-shadow 0.2s ease;
     }
 
-
     .donate-button:hover {
       transform: translateY(-2px);
 
@@ -221,7 +218,7 @@
     }
 
 
-    /* WEB NADAČNÍHO FONDU - VLEVO DOLE */
+    /* WEB NADAČNÍHO FONDU */
 
     .mamy-button {
       position: fixed;
@@ -258,7 +255,6 @@
         box-shadow 0.2s ease;
     }
 
-
     .mamy-button:hover {
       transform: translateY(-2px);
 
@@ -282,7 +278,6 @@
       content-visibility: auto;
       contain-intrinsic-size: 500px;
     }
-
 
     .route-map iframe {
       display: block;
@@ -310,23 +305,19 @@
         transform-origin: center center;
       }
 
-
       .counter h2 {
         margin-bottom: 6px;
         font-size: clamp(10px, 2.1vw, 18px);
       }
 
-
       .counter .amount {
         font-size: clamp(27px, 6vw, 50px);
       }
-
 
       .counter .percentage {
         margin-top: 7px;
         font-size: clamp(7px, 1.7vw, 13px);
       }
-
 
       .counter .progress {
         height: 12px;
@@ -334,8 +325,10 @@
         border-width: 2px !important;
       }
 
-
-      /* CHCI PŘISPĚT NA MOBILU */
+      .counter .update-info {
+        margin-top: 5px;
+        font-size: clamp(6px, 1.5vw, 10px);
+      }
 
       .donate-button {
         right: 14px;
@@ -346,9 +339,6 @@
         font-size: 14px;
       }
 
-
-      /* WEB NADAČNÍHO FONDU NA MOBILU */
-
       .mamy-button {
         left: 14px;
         bottom: 14px;
@@ -357,7 +347,6 @@
 
         font-size: 14px;
       }
-
 
       .route-map {
         height: 60vh;
@@ -412,9 +401,7 @@
   <main>
 
 
-    <!-- STRÁNKA 1
-         Načítá se okamžitě.
-    -->
+    <!-- STRÁNKA 1 -->
 
     <div class="page">
 
@@ -431,9 +418,7 @@
 
 
 
-    <!-- STRÁNKA 2
-         Prohlížeč ji načte podle potřeby.
-    -->
+    <!-- STRÁNKA 2 + POČÍTADLO -->
 
     <div class="page page-two">
 
@@ -485,6 +470,12 @@
 
         </div>
 
+
+        <div class="update-info">
+          Částka se aktualizuje každých 5 minut.
+        </div>
+
+
       </section>
 
     </div>
@@ -529,18 +520,7 @@
 
 
 
-    <!--
-      MAPA
-
-      POZOR:
-      NENÍ TU IFRAME SE SRC.
-
-      Mapy.com se tedy při otevření webu
-      vůbec nestahují.
-
-      JavaScript iframe vytvoří až tehdy,
-      když se uživatel přiblíží k mapě.
-    -->
+    <!-- MAPA -->
 
     <section
       class="route-map"
@@ -577,18 +557,9 @@
         window.scrollY + imageRect.top;
 
 
-      /*
-        POZICE QR KÓDU V PAGE-3.PNG
-      */
-
       const qrPosition =
         imageTop + (imageRect.height * 0.81);
 
-
-      /*
-        QR BUDE PŘIBLIŽNĚ 30 %
-        OD HORNÍHO OKRAJE OBRAZOVKY
-      */
 
       const targetScroll =
         qrPosition - (window.innerHeight * 0.30);
@@ -634,11 +605,6 @@
           );
 
 
-          /*
-            Lazy obrázek se tímto dostane
-            do blízkosti viewportu a načte se.
-          */
-
           pageThreeImage.scrollIntoView({
             behavior: "auto",
             block: "center"
@@ -652,7 +618,7 @@
 
 
     /* =========================================
-       MAPA - OPRAVDOVÉ ODLOŽENÉ NAČTENÍ
+       MAPA - ODLOŽENÉ NAČÍTÁNÍ
        ========================================= */
 
     const routeMap =
@@ -697,11 +663,6 @@
     }
 
 
-    /*
-      Mapu začneme načítat až když je
-      uživatel přibližně 800 px od ní.
-    */
-
     if ("IntersectionObserver" in window) {
 
       const mapObserver =
@@ -736,10 +697,6 @@
 
     } else {
 
-      /*
-        Fallback pro starší prohlížeče.
-      */
-
       loadMap();
 
     }
@@ -763,9 +720,11 @@
 
 
         if (!response.ok) {
+
           throw new Error(
             "Nepodařilo se načíst amount.json"
           );
+
         }
 
 
@@ -849,11 +808,6 @@
           );
 
 
-        /*
-          U MALÉ ČÁSTKY UKÁŽEME
-          MINIMÁLNĚ 1,5 % PRUHU.
-        */
-
         const visibleBarPercentage =
           realBarPercentage > 0
             ? Math.max(
@@ -893,12 +847,8 @@
     }
 
 
-    /* PRVNÍ NAČTENÍ ČÁSTKY */
-
     updateAmount();
 
-
-    /* AKTUALIZACE KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
