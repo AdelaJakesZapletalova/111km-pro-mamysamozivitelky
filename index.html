@@ -13,6 +13,7 @@
   >
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -22,7 +23,6 @@
       margin: 0;
       padding: 0;
       background: #fff;
-      color: #111;
     }
 
     body {
@@ -49,29 +49,46 @@
       padding: 0;
     }
 
-    /* DRUHÁ STRÁNKA */
+
+    /* ========================================
+       POČÍTADLO NA DRUHÉ STRÁNCE
+       ======================================== */
+
     .page-two {
       position: relative;
       width: 100%;
     }
 
-    /* POČÍTADLO */
     .counter {
       position: absolute;
 
+      /* POZICE V PRÁZDNÉM PROSTORU */
       top: 15%;
       left: 46%;
 
+      /* ŠÍŘKA BLOKU */
       width: 32%;
 
+      /* 15 % VĚTŠÍ */
+      transform: scale(1.15);
+      transform-origin: center center;
+
       text-align: center;
+
+      /* FIALOVÁ */
+      color: #C68BFF;
+
       z-index: 10;
-      color: #111;
     }
+
+
+    /* NADPIS */
 
     .counter h2 {
       margin: 0 0 10px;
       padding: 0;
+
+      color: #C68BFF;
 
       font-size: clamp(18px, 2.2vw, 32px);
       font-weight: 700;
@@ -80,18 +97,28 @@
       white-space: nowrap;
     }
 
+
+    /* VYBRANÁ ČÁSTKA */
+
     .amount {
       margin: 0;
       padding: 0;
+
+      color: #C68BFF;
 
       font-size: clamp(45px, 6vw, 82px);
       font-weight: 800;
       line-height: 1;
     }
 
+
+    /* PROCENTA + CÍL */
+
     .percentage {
       margin: 14px 0 0;
       padding: 0;
+
+      color: #C68BFF;
 
       font-size: clamp(13px, 1.3vw, 19px);
       font-weight: 700;
@@ -101,9 +128,12 @@
       white-space: nowrap;
     }
 
-    /* UKAZATEL */
+
+    /* PROGRESS BAR */
+
     .progress {
       position: relative;
+
       display: block;
 
       width: 100%;
@@ -111,27 +141,38 @@
 
       margin: 14px auto 0;
 
-      border: 2px solid #111;
+      /* FIALOVÝ RÁMEČEK */
+      border: 2px solid #C68BFF;
+
       background: #fff;
 
       overflow: hidden;
     }
 
-    /* JEDINÁ ZMĚNA: FIALOVÁ VÝPLŇ */
+
+    /* FIALOVÁ VÝPLŇ */
+
     .progress-fill {
       height: 100%;
       width: 0%;
+
       background: #C68BFF;
+
       transition: width 0.6s ease;
     }
 
+
     /* MOBIL */
+
     @media (max-width: 700px) {
 
       .counter {
         top: 15%;
         left: 46%;
         width: 32%;
+
+        transform: scale(1.15);
+        transform-origin: center center;
       }
 
       .counter h2 {
@@ -150,33 +191,51 @@
       .progress {
         height: 12px;
         margin-top: 8px;
-        border-width: 1.5px;
+        border-width: 2px;
       }
+
     }
 
+
     @media (min-width: 1500px) {
+
       main {
         max-width: 1800px;
         margin: auto;
       }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
   <main>
 
-    <!-- STRÁNKA 1 -->
+
+    <!-- ========================================
+         STRÁNKA 1
+         ======================================== -->
+
     <div class="page">
+
       <img
         class="canva"
         src="page-1.png"
         alt="Adéla běží 111 km za mámy samoživitelky"
       >
+
     </div>
 
-    <!-- STRÁNKA 2 -->
+
+
+    <!-- ========================================
+         STRÁNKA 2 + POČÍTADLO
+         ======================================== -->
+
     <div class="page page-two">
 
       <img
@@ -185,9 +244,17 @@
         alt="O projektu"
       >
 
-      <div class="counter">
 
-        <h2>Společně jsme zatím vybrali</h2>
+      <section
+        class="counter"
+        aria-label="Stav sbírky"
+      >
+
+
+        <h2>
+          Společně jsme zatím vybrali
+        </h2>
+
 
         <div
           class="amount"
@@ -196,6 +263,7 @@
           0 Kč
         </div>
 
+
         <div
           class="percentage"
           id="percentage"
@@ -203,36 +271,60 @@
           0 % z cílových 500 000 Kč
         </div>
 
-        <div class="progress">
+
+        <div
+          class="progress"
+          aria-label="Průběh sbírky"
+        >
+
           <div
             class="progress-fill"
             id="progress-fill"
           ></div>
+
         </div>
 
-      </div>
+
+      </section>
 
     </div>
 
-    <!-- STRÁNKA 3 -->
+
+
+    <!-- ========================================
+         STRÁNKA 3
+         ======================================== -->
+
     <div class="page">
+
       <img
         class="canva"
         src="page-3.png"
-        alt="Proč pomáhat"
+        alt="Proč pomáhat maminkám samoživitelkám"
       >
+
     </div>
 
-    <!-- STRÁNKA 4 -->
+
+
+    <!-- ========================================
+         STRÁNKA 4
+         ======================================== -->
+
     <div class="page">
+
       <img
         class="canva"
         src="page-4.png"
         alt="Nadační fond Mámy v kaši"
       >
+
     </div>
 
+
   </main>
+
+
 
   <script>
 
@@ -240,20 +332,30 @@
 
       try {
 
+        /* NAČTENÍ amount.json */
+
         const response = await fetch(
-          "amount.json?time=" + Date.now(),
+          "./amount.json?time=" + Date.now(),
           {
             cache: "no-store"
           }
         );
 
+
         if (!response.ok) {
+
           throw new Error(
             "Nepodařilo se načíst amount.json"
           );
+
         }
 
-        const data = await response.json();
+
+        const data =
+          await response.json();
+
+
+        /* HODNOTY */
 
         const raised =
           Number(data.raised) || 0;
@@ -261,10 +363,10 @@
         const goal =
           Number(data.goal) || 500000;
 
-        const percentage =
-          goal > 0
-            ? (raised / goal) * 100
-            : 0;
+
+        /* ========================================
+           VYBRANÁ ČÁSTKA
+           ======================================== */
 
         document
           .getElementById("amount")
@@ -274,18 +376,34 @@
               {
                 maximumFractionDigits: 0
               }
-            ) + " Kč";
+            )
+            + " Kč";
+
+
+        /* ========================================
+           PROCENTA
+           ======================================== */
+
+        const percentage =
+          goal > 0
+            ? (raised / goal) * 100
+            : 0;
+
 
         let percentageText;
+
 
         if (
           percentage > 0 &&
           percentage < 0.01
         ) {
 
-          percentageText = "< 0,01";
+          percentageText =
+            "< 0,01";
 
-        } else {
+        }
+
+        else {
 
           percentageText =
             percentage.toLocaleString(
@@ -297,26 +415,47 @@
                 maximumFractionDigits: 2
               }
             );
+
         }
+
 
         document
           .getElementById("percentage")
           .textContent =
-            percentageText +
-            " % z cílových " +
-            goal.toLocaleString("cs-CZ") +
-            " Kč";
+            percentageText
+            + " % z cílových "
+            + goal.toLocaleString("cs-CZ")
+            + " Kč";
 
-        const barPercentage =
+
+        /* ========================================
+           PROGRESS BAR
+           ======================================== */
+
+        const realBarPercentage =
           Math.min(
-            percentage,
+            Math.max(percentage, 0),
             100
           );
+
+
+        /*
+          Při velmi malé částce necháme
+          alespoň malý fialový začátek,
+          aby bylo vidět, že se bar plní.
+        */
+
+        const visibleBarPercentage =
+          realBarPercentage > 0
+            ? Math.max(realBarPercentage, 1.5)
+            : 0;
+
 
         document
           .getElementById("progress-fill")
           .style.width =
-            barPercentage + "%";
+            visibleBarPercentage + "%";
+
 
       }
 
@@ -327,10 +466,31 @@
           error
         );
 
+
+        document
+          .getElementById("amount")
+          .textContent =
+            "— Kč";
+
+
+        document
+          .getElementById("percentage")
+          .textContent =
+            "Cíl 500 000 Kč";
+
       }
+
     }
 
+
+
+    /* NAČÍST HNED */
+
     updateAmount();
+
+
+
+    /* OBNOVA KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
@@ -338,6 +498,7 @@
     );
 
   </script>
+
 
 </body>
 
