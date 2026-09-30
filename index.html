@@ -25,10 +25,6 @@
       box-sizing: border-box;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     html,
     body {
       margin: 0;
@@ -74,24 +70,6 @@
     .page-three {
       position: relative;
       width: 100%;
-    }
-
-
-    /*
-      CÍLOVÝ BOD PRO TLAČÍTKO
-      63 % = QR KÓD V HORNÍ ČÁSTI OBRAZOVKY
-    */
-
-    .donate-target {
-      position: absolute;
-
-      top: 63%;
-      left: 0;
-
-      width: 1px;
-      height: 1px;
-
-      pointer-events: none;
     }
 
 
@@ -334,6 +312,7 @@
   <a
     class="donate-button"
     href="#prispet"
+    id="donate-button"
     aria-label="Přejít k QR kódu a možnostem příspěvku"
   >
     CHCI PŘISPĚT
@@ -420,24 +399,19 @@
 
     <!-- STRÁNKA 3 -->
 
-    <div class="page page-three">
+    <div
+      class="page page-three"
+      id="prispet"
+    >
 
       <img
         class="canva"
+        id="page-three-image"
         src="page-3.png"
         alt="Proč pomáhat maminkám samoživitelkám"
         loading="lazy"
         decoding="async"
       >
-
-
-      <!-- CÍLOVÁ POZICE PRO QR -->
-
-      <div
-        id="prispet"
-        class="donate-target"
-        aria-hidden="true"
-      ></div>
 
     </div>
 
@@ -482,6 +456,117 @@
 
   <script>
 
+    /*
+      TLAČÍTKO CHCI PŘISPĚT
+
+      QR KÓD JE PŘIBLIŽNĚ V 80 % VÝŠKY
+      TŘETÍHO OBRÁZKU.
+
+      JAVASCRIPT SPOČÍTÁ JEHO SKUTEČNOU
+      POZICI PODLE VELIKOSTI OBRÁZKU.
+    */
+
+    const donateButton =
+      document.getElementById("donate-button");
+
+
+    const pageThreeImage =
+      document.getElementById("page-three-image");
+
+
+    function scrollToQr() {
+
+      const imageRect =
+        pageThreeImage.getBoundingClientRect();
+
+
+      const imageTop =
+        window.scrollY + imageRect.top;
+
+
+      /*
+        STŘED QR KÓDU JE CCA V 81 % OBRÁZKU
+      */
+
+      const qrPosition =
+        imageTop + (imageRect.height * 0.81);
+
+
+      /*
+        QR POSADÍME ASI 30 % OD HORNÍHO
+        OKRAJE OBRAZOVKY
+      */
+
+      const targetScroll =
+        qrPosition - (window.innerHeight * 0.30);
+
+
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth"
+      });
+
+
+      history.replaceState(
+        null,
+        "",
+        "#prispet"
+      );
+
+    }
+
+
+    donateButton.addEventListener(
+      "click",
+      function(event) {
+
+        event.preventDefault();
+
+
+        /*
+          KDYŽ JE OBRÁZEK UŽ NAČTENÝ,
+          JDEME ROVNOU NA QR.
+        */
+
+        if (pageThreeImage.complete) {
+
+          scrollToQr();
+
+        } else {
+
+          /*
+            KDYŽ JE PAGE-3 JEŠTĚ LAZY-LOADED,
+            POČKÁME NA JEHO NAČTENÍ.
+          */
+
+          pageThreeImage.addEventListener(
+            "load",
+            scrollToQr,
+            {
+              once: true
+            }
+          );
+
+
+          /*
+            PŘIBLÍŽÍME SE K PAGE 3,
+            ABY PROHLÍŽEČ OBRÁZEK NAČETL.
+          */
+
+          pageThreeImage.scrollIntoView({
+            behavior: "auto",
+            block: "center"
+          });
+
+        }
+
+      }
+    );
+
+
+
+    /* POČÍTADLO */
+
     async function updateAmount() {
 
       try {
@@ -508,8 +593,6 @@
           Number(data.goal) || 500000;
 
 
-        /* ČÁSTKA */
-
         document
           .getElementById("amount")
           .textContent =
@@ -520,8 +603,6 @@
               }
             ) + " Kč";
 
-
-        /* PROCENTA */
 
         const percentage =
           goal > 0
@@ -563,8 +644,6 @@
             + goal.toLocaleString("cs-CZ")
             + " Kč";
 
-
-        /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
@@ -609,8 +688,6 @@
 
     updateAmount();
 
-
-    /* KONTROLA NOVÉ ČÁSTKY KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
