@@ -1,0 +1,122 @@
+name: Aktualizovat vybranou castku
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Stahnout repozitar
+        uses: actions/checkout@v4
+
+      - name: Spocitat prijate dary
+        shell: python
+        run: |
+          import json
+          import urllib.request
+          from datetime import datetime, timezone
+
+          URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
+          ACCOUNT = 377658515
+          START_DATE = "2026-09-30"
+          GOAL = 500000
+
+          today = datetime.now(timezone.utc).date().isoformat()
+
+          page = 1
+          raised = 0.0
+
+          while True:
+              payload = {
+                  "accountList": [
+                      {"accountNumberM24": ACCOUNT}
+                  ],
+                  "filterList": [
+                      {
+                          "name": "AccountingDate",
+                          "operator": "ge",
+                          "valueList": [START_DATE]
+                      },
+                      {
+                          "name": "AccountingDate",
+                          "operator": "le",
+                          "valueList": [today]
+                      }
+                  ],
+                  "paging": {
+                      "rowsPerPage": 100,
+                      "pageNumber": page
+                  },
+                  "sortList": [
+                      {
+                          "name": "AccountingDate",
+                          "direction": "DESC",
+                          "order": 1
+                      }
+                  ]
+              }
+
+              request = urllib.request.Request(
+                  URL,
+                  data=json.dumps(payload).encode("utf-8"),
+                  headers={
+                      "Content-Type": "application/json",
+                      "Accept": "application/json",
+                      "User-Agent": "Mozilla/5.0"
+                  },
+                  method="POST"
+              )
+
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  data = json.load(response)
+
+              transactions = data.get("accountedTransaction", [])
+
+              for transaction in transactions:
+                  info = transaction.get("baseInfo", {})
+                  amount_data = info.get("accountAmountData", {})
+
+                  amount = float(amount_data.get("amount", 0) or 0)
+                  currency = amount_data.get("currencyCode")
+
+                  if currency == "CZK" and amount > 0:
+                      raised += amount
+
+              paging = data.get("paging", {})
+              page_count = int(paging.get("pageCount", 1) or 1)
+
+              if page >= page_count:
+                  break
+
+              page += 1
+
+          result = {
+              "raised": round(raised, 2),
+              "goal": GOAL
+          }
+
+          with open("amount.json", "w", encoding="utf-8") as f:
+              json.dump(result, f, ensure_ascii=False, indent=2)
+              f.write("\n")
+
+          print(result)
+
+      - name: Ulozit novou castku
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add amount.json
+
+          if git diff --cached --quiet; then
+            echo "Castka se nezmenila."
+          else
+            git commit -m "Aktualizace vybrane castky"
+            git push
+          fi
