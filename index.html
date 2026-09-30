@@ -101,7 +101,7 @@
       white-space: nowrap;
     }
 
-    /* UKAZATEL */
+    /* UKAZATEL VYBRANÉ ČÁSTKY */
     .progress {
       position: relative;
       display: block;
@@ -117,11 +117,13 @@
       overflow: hidden;
     }
 
-    /* JEDINÁ ZMĚNA: FIALOVÁ VÝPLŇ */
+    /* FIALOVÁ VÝPLŇ */
     .progress-fill {
       height: 100%;
       width: 0%;
+
       background: #C68BFF;
+
       transition: width 0.6s ease;
     }
 
@@ -169,12 +171,15 @@
 
     <!-- STRÁNKA 1 -->
     <div class="page">
+
       <img
         class="canva"
         src="page-1.png"
         alt="Adéla běží 111 km za mámy samoživitelky"
       >
+
     </div>
+
 
     <!-- STRÁNKA 2 -->
     <div class="page page-two">
@@ -185,9 +190,12 @@
         alt="O projektu"
       >
 
+      <!-- POČÍTADLO -->
       <div class="counter">
 
-        <h2>Společně jsme zatím vybrali</h2>
+        <h2>
+          Společně jsme zatím vybrali
+        </h2>
 
         <div
           class="amount"
@@ -204,35 +212,44 @@
         </div>
 
         <div class="progress">
+
           <div
             class="progress-fill"
             id="progress-fill"
           ></div>
+
         </div>
 
       </div>
 
     </div>
 
+
     <!-- STRÁNKA 3 -->
     <div class="page">
+
       <img
         class="canva"
         src="page-3.png"
         alt="Proč pomáhat"
       >
+
     </div>
+
 
     <!-- STRÁNKA 4 -->
     <div class="page">
+
       <img
         class="canva"
         src="page-4.png"
         alt="Nadační fond Mámy v kaši"
       >
+
     </div>
 
   </main>
+
 
   <script>
 
@@ -261,10 +278,16 @@
         const goal =
           Number(data.goal) || 500000;
 
+
+        /* PROCENTA */
+
         const percentage =
           goal > 0
             ? (raised / goal) * 100
             : 0;
+
+
+        /* ČÁSTKA */
 
         document
           .getElementById("amount")
@@ -275,6 +298,9 @@
                 maximumFractionDigits: 0
               }
             ) + " Kč";
+
+
+        /* TEXT PROCENT */
 
         let percentageText;
 
@@ -297,7 +323,9 @@
                 maximumFractionDigits: 2
               }
             );
+
         }
+
 
         document
           .getElementById("percentage")
@@ -307,11 +335,15 @@
             goal.toLocaleString("cs-CZ") +
             " Kč";
 
+
+        /* VYPLNĚNÍ UKAZATELE */
+
         const barPercentage =
           Math.min(
             percentage,
             100
           );
+
 
         document
           .getElementById("progress-fill")
@@ -328,9 +360,16 @@
         );
 
       }
+
     }
 
+
+    /* NAČTENÍ PŘI OTEVŘENÍ WEBU */
+
     updateAmount();
+
+
+    /* AKTUALIZACE KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
