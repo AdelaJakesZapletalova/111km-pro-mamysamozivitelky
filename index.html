@@ -1,55 +1,161 @@
 <!doctype html>
 <html lang="cs">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Adéla běží 111 km za mámy samoživitelky</title>
-<meta name="description" content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí.">
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#fff;color:#111}
-body{font-family:Arial,Helvetica,sans-serif}
-main{width:100%;overflow:hidden}
-.canva{display:block;width:100%;height:auto;margin:0}
-.counter{
-  padding:42px 20px 48px;text-align:center;background:#fff;
-  border-top:1px solid #eee;border-bottom:1px solid #eee
-}
-.counter h2{margin:0 0 10px;font-size:clamp(22px,3vw,38px)}
-.amount{font-size:clamp(42px,8vw,92px);font-weight:800;line-height:1}
-.note{margin-top:12px;font-size:15px}
-@media(min-width:1500px){
-  main{max-width:1800px;margin:auto}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Adéla běží 111 km za mámy samoživitelky</title>
+
+  <meta
+    name="description"
+    content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí."
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #111;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1366px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .canva {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+    }
+
+    .counter {
+      padding: 55px 20px 60px;
+      text-align: center;
+      background: #fff;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .counter h2 {
+      margin: 0 0 14px;
+      font-size: clamp(22px, 3vw, 38px);
+    }
+
+    .amount {
+      margin: 0;
+      font-size: clamp(44px, 8vw, 92px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .note {
+      margin-top: 14px;
+      margin-bottom: 0;
+      font-size: 15px;
+    }
+
+    @media (min-width: 1500px) {
+      main {
+        max-width: 1800px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<main>
-  <img class="canva" src="01-uvod.png" alt="Adéla běží 111 km za mámy samoživitelky">
-  <img class="canva" src="02-o-projektu.png" alt="O projektu">
-  <img class="canva" src="03-proc-pomahat.png" alt="Proč pomáhat maminkám samoživitelkám">
-  <section class="counter" aria-label="Vybraná částka">
-    <h2>Společně jsme zatím vybrali</h2>
-    <div class="amount"><span id="amount">0</span> Kč</div>
-    <div class="note">Děkuju za každou pomoc.</div>
-  </section>
-  <img class="canva" src="04-nadacni-fond.png" alt="Nadační fond MÁMY V KAŠI">
-</main>
-<script>
-async function updateAmount(){
-  try{
-    const r=await fetch('amount.json?ts='+Date.now(),{cache:'no-store'});
-    if(!r.ok) throw new Error();
-    const d=await r.json();
-    const value=Number(d.amount ?? d.castka ?? d.value ?? 0);
-    document.getElementById('amount').textContent =
-      new Intl.NumberFormat('cs-CZ').format(value);
-  }catch(e){
-    document.getElementById('amount').textContent='0';
-  }
-}
-updateAmount();
-setInterval(updateAmount,60000);
-</script>
+
+  <main>
+
+    <!-- 1. stránka z Canvy -->
+    <img
+      class="canva"
+      src="page-1.png"
+      alt="Adéla běží 111 km za mámy samoživitelky"
+    >
+
+    <!-- 2. stránka z Canvy -->
+    <img
+      class="canva"
+      src="page-2.png"
+      alt="O projektu"
+    >
+
+    <!-- 3. stránka z Canvy -->
+    <img
+      class="canva"
+      src="page-3.png"
+      alt="Proč pomáhat maminkám samoživitelkám"
+    >
+
+    <!-- POČÍTADLO SBÍRKY -->
+    <section class="counter" aria-label="Vybraná částka">
+      <h2>Společně jsme zatím vybrali</h2>
+
+      <div class="amount">
+        <span id="amount">0</span> Kč
+      </div>
+
+      <p class="note">Děkuju za každou pomoc. &lt;3</p>
+    </section>
+
+    <!-- 4. stránka z Canvy -->
+    <img
+      class="canva"
+      src="page-4.png"
+      alt="Nadační fond MÁMY V KAŠI"
+    >
+
+  </main>
+
+  <script>
+    async function updateAmount() {
+      try {
+        const response = await fetch(
+          "amount.json?time=" + Date.now(),
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          throw new Error("Nepodařilo se načíst amount.json");
+        }
+
+        const data = await response.json();
+
+        const value =
+          data.amount ??
+          data.value ??
+          data.total ??
+          0;
+
+        document.getElementById("amount").textContent =
+          Number(value).toLocaleString("cs-CZ");
+
+      } catch (error) {
+        console.error("Chyba při načítání částky:", error);
+        document.getElementById("amount").textContent = "—";
+      }
+    }
+
+    updateAmount();
+
+    // aktualizace částky každou minutu
+    setInterval(updateAmount, 60000);
+  </script>
+
 </body>
 </html>
