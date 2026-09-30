@@ -43,7 +43,7 @@
       padding: 0;
     }
 
-    /* Druhá Canva stránka + počítadlo */
+    /* Druhá stránka s počítadlem */
     .page-two {
       position: relative;
       width: 100%;
@@ -52,8 +52,8 @@
     .counter {
       position: absolute;
 
-      /* umístění v bílém prostoru nad "O CO JDE" */
-      top: 55%;
+      /* pozice v bílém prostoru */
+      top: 43%;
       left: 50%;
       transform: translate(-50%, -50%);
 
@@ -76,23 +76,14 @@
       line-height: 1;
     }
 
-    .note {
-      margin: 10px 0 0;
-      font-size: clamp(12px, 1.3vw, 17px);
-    }
-
     @media (max-width: 600px) {
       .counter {
         width: 82%;
-        top: 55%;
+        top: 43%;
       }
 
       .counter h2 {
         margin-bottom: 5px;
-      }
-
-      .note {
-        margin-top: 6px;
       }
     }
   </style>
@@ -126,8 +117,6 @@
           <span id="amount">—</span> Kč
         </div>
 
-        <p class="note">Děkuju za každou pomoc. &lt;3</p>
-
       </section>
 
     </div>
@@ -151,9 +140,12 @@
   <script>
     async function updateAmount() {
       try {
+
         const response = await fetch(
           "./amount.json?v=" + Date.now(),
-          { cache: "no-store" }
+          {
+            cache: "no-store"
+          }
         );
 
         if (!response.ok) {
@@ -168,12 +160,15 @@
           value.toLocaleString("cs-CZ");
 
       } catch (error) {
+
         console.error(error);
+
         document.getElementById("amount").textContent = "—";
       }
     }
 
     updateAmount();
+
     setInterval(updateAmount, 60000);
   </script>
 
