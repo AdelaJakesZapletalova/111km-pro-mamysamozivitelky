@@ -157,6 +157,26 @@
     }
 
 
+    /* MAPA TRASY */
+
+    .route-map {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    .route-map iframe {
+      display: block;
+      width: 100%;
+      height: 70vh;
+      min-height: 500px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+
     /* MOBIL */
 
     @media (max-width: 700px) {
@@ -188,6 +208,11 @@
         height: 12px;
         margin-top: 7px;
         border-width: 2px !important;
+      }
+
+      .route-map iframe {
+        height: 60vh;
+        min-height: 420px;
       }
 
     }
@@ -291,6 +316,24 @@
       >
 
     </div>
+
+
+
+    <!-- MAPA TRASY -->
+
+    <section
+      class="route-map"
+      aria-label="Mapa trasy 111 km"
+    >
+
+      <iframe
+        src="https://mapy.com/s/fomobopetu"
+        title="Trasa 111 km Brdami"
+        loading="lazy"
+        allowfullscreen
+      ></iframe>
+
+    </section>
 
 
 
