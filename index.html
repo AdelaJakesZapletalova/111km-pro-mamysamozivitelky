@@ -59,36 +59,40 @@
       width: 100%;
     }
 
+
     .counter {
       position: absolute;
 
-      /* POZICE V PRÁZDNÉM PROSTORU */
-      top: 15%;
-      left: 46%;
+      /*
+        STŘED BÍLÉHO PROSTORU
+        mezi levou kresbou a pravou fotografií
+      */
+      top: 11%;
+      left: 58%;
 
-      /* ŠÍŘKA BLOKU */
-      width: 32%;
+      width: 31%;
 
-      /* 15 % VĚTŠÍ */
-      transform: scale(1.15);
+      /*
+        Přesné vystředění podle bodu výše
+        + zvětšení celého počítadla o 15 %
+      */
+      transform: translate(-50%, -50%) scale(1.15);
       transform-origin: center center;
 
       text-align: center;
-
-      /* FIALOVÁ */
-      color: #C68BFF;
-
       z-index: 10;
+
+      color: #C68BFF !important;
     }
 
 
     /* NADPIS */
 
     .counter h2 {
-      margin: 0 0 10px;
+      margin: 0 0 12px 0;
       padding: 0;
 
-      color: #C68BFF;
+      color: #C68BFF !important;
 
       font-size: clamp(18px, 2.2vw, 32px);
       font-weight: 700;
@@ -100,11 +104,11 @@
 
     /* VYBRANÁ ČÁSTKA */
 
-    .amount {
+    .counter .amount {
       margin: 0;
       padding: 0;
 
-      color: #C68BFF;
+      color: #C68BFF !important;
 
       font-size: clamp(45px, 6vw, 82px);
       font-weight: 800;
@@ -114,11 +118,11 @@
 
     /* PROCENTA + CÍL */
 
-    .percentage {
-      margin: 14px 0 0;
+    .counter .percentage {
+      margin: 14px 0 0 0;
       padding: 0;
 
-      color: #C68BFF;
+      color: #C68BFF !important;
 
       font-size: clamp(13px, 1.3vw, 19px);
       font-weight: 700;
@@ -131,9 +135,8 @@
 
     /* PROGRESS BAR */
 
-    .progress {
+    .counter .progress {
       position: relative;
-
       display: block;
 
       width: 100%;
@@ -141,57 +144,63 @@
 
       margin: 14px auto 0;
 
-      /* FIALOVÝ RÁMEČEK */
-      border: 2px solid #C68BFF;
-
-      background: #fff;
+      border: 2px solid #C68BFF !important;
+      background: transparent;
 
       overflow: hidden;
     }
 
 
-    /* FIALOVÁ VÝPLŇ */
+    /* VÝPLŇ PROGRESS BARU */
 
-    .progress-fill {
+    .counter .progress-fill {
+      display: block;
+
       height: 100%;
       width: 0%;
 
-      background: #C68BFF;
+      background-color: #C68BFF !important;
 
       transition: width 0.6s ease;
     }
 
 
-    /* MOBIL */
+    /* ========================================
+       MOBIL
+       ======================================== */
 
     @media (max-width: 700px) {
 
       .counter {
-        top: 15%;
-        left: 46%;
-        width: 32%;
+        top: 11%;
+        left: 58%;
+        width: 31%;
 
-        transform: scale(1.15);
+        transform: translate(-50%, -50%) scale(1.15);
         transform-origin: center center;
       }
 
       .counter h2 {
-        font-size: clamp(11px, 2.1vw, 18px);
+        margin-bottom: 6px;
+
+        font-size: clamp(10px, 2.1vw, 18px);
       }
 
-      .amount {
-        font-size: clamp(28px, 6vw, 50px);
+      .counter .amount {
+        font-size: clamp(27px, 6vw, 50px);
       }
 
-      .percentage {
-        margin-top: 8px;
-        font-size: clamp(8px, 1.7vw, 13px);
+      .counter .percentage {
+        margin-top: 7px;
+
+        font-size: clamp(7px, 1.7vw, 13px);
       }
 
-      .progress {
+      .counter .progress {
         height: 12px;
-        margin-top: 8px;
-        border-width: 2px;
+        margin-top: 7px;
+
+        border-width: 2px !important;
       }
 
     }
@@ -207,7 +216,6 @@
     }
 
   </style>
-
 </head>
 
 
@@ -216,9 +224,7 @@
   <main>
 
 
-    <!-- ========================================
-         STRÁNKA 1
-         ======================================== -->
+    <!-- STRÁNKA 1 -->
 
     <div class="page">
 
@@ -232,9 +238,7 @@
 
 
 
-    <!-- ========================================
-         STRÁNKA 2 + POČÍTADLO
-         ======================================== -->
+    <!-- STRÁNKA 2 + POČÍTADLO -->
 
     <div class="page page-two">
 
@@ -249,7 +253,6 @@
         class="counter"
         aria-label="Stav sbírky"
       >
-
 
         <h2>
           Společně jsme zatím vybrali
@@ -284,16 +287,13 @@
 
         </div>
 
-
       </section>
 
     </div>
 
 
 
-    <!-- ========================================
-         STRÁNKA 3
-         ======================================== -->
+    <!-- STRÁNKA 3 -->
 
     <div class="page">
 
@@ -307,9 +307,7 @@
 
 
 
-    <!-- ========================================
-         STRÁNKA 4
-         ======================================== -->
+    <!-- STRÁNKA 4 -->
 
     <div class="page">
 
@@ -332,8 +330,6 @@
 
       try {
 
-        /* NAČTENÍ amount.json */
-
         const response = await fetch(
           "./amount.json?time=" + Date.now(),
           {
@@ -343,19 +339,12 @@
 
 
         if (!response.ok) {
-
-          throw new Error(
-            "Nepodařilo se načíst amount.json"
-          );
-
+          throw new Error("Nepodařilo se načíst amount.json");
         }
 
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
-
-        /* HODNOTY */
 
         const raised =
           Number(data.raised) || 0;
@@ -364,9 +353,7 @@
           Number(data.goal) || 500000;
 
 
-        /* ========================================
-           VYBRANÁ ČÁSTKA
-           ======================================== */
+        /* ČÁSTKA */
 
         document
           .getElementById("amount")
@@ -376,13 +363,10 @@
               {
                 maximumFractionDigits: 0
               }
-            )
-            + " Kč";
+            ) + " Kč";
 
 
-        /* ========================================
-           PROCENTA
-           ======================================== */
+        /* PROCENTA */
 
         const percentage =
           goal > 0
@@ -398,12 +382,9 @@
           percentage < 0.01
         ) {
 
-          percentageText =
-            "< 0,01";
+          percentageText = "< 0,01";
 
-        }
-
-        else {
+        } else {
 
           percentageText =
             percentage.toLocaleString(
@@ -428,9 +409,7 @@
             + " Kč";
 
 
-        /* ========================================
-           PROGRESS BAR
-           ======================================== */
+        /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
@@ -438,12 +417,6 @@
             100
           );
 
-
-        /*
-          Při velmi malé částce necháme
-          alespoň malý fialový začátek,
-          aby bylo vidět, že se bar plní.
-        */
 
         const visibleBarPercentage =
           realBarPercentage > 0
@@ -457,9 +430,7 @@
             visibleBarPercentage + "%";
 
 
-      }
-
-      catch (error) {
+      } catch (error) {
 
         console.error(
           "Chyba při načítání částky:",
@@ -469,28 +440,20 @@
 
         document
           .getElementById("amount")
-          .textContent =
-            "— Kč";
+          .textContent = "— Kč";
 
 
         document
           .getElementById("percentage")
-          .textContent =
-            "Cíl 500 000 Kč";
+          .textContent = "Cíl 500 000 Kč";
 
       }
 
     }
 
 
-
-    /* NAČÍST HNED */
-
     updateAmount();
 
-
-
-    /* OBNOVA KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
@@ -498,7 +461,6 @@
     );
 
   </script>
-
 
 </body>
 
