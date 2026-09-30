@@ -43,35 +43,56 @@
       padding: 0;
     }
 
+    /* Druhá Canva stránka + počítadlo */
+    .page-two {
+      position: relative;
+      width: 100%;
+    }
+
     .counter {
-      padding: 55px 20px 60px;
+      position: absolute;
+
+      /* umístění v bílém prostoru nad "O CO JDE" */
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      width: 70%;
       text-align: center;
-      background: #fff;
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee;
+      z-index: 10;
+      color: #111;
     }
 
     .counter h2 {
-      margin: 0 0 14px;
-      font-size: clamp(22px, 3vw, 38px);
+      margin: 0 0 8px;
+      font-size: clamp(18px, 2.5vw, 34px);
+      font-weight: 700;
     }
 
     .amount {
       margin: 0;
-      font-size: clamp(44px, 8vw, 92px);
+      font-size: clamp(42px, 7vw, 88px);
       font-weight: 800;
       line-height: 1;
     }
 
     .note {
-      margin-top: 14px;
-      margin-bottom: 0;
-      font-size: 15px;
+      margin: 10px 0 0;
+      font-size: clamp(12px, 1.3vw, 17px);
     }
 
-    @media (min-width: 1500px) {
-      main {
-        max-width: 1800px;
+    @media (max-width: 600px) {
+      .counter {
+        width: 82%;
+        top: 55%;
+      }
+
+      .counter h2 {
+        margin-bottom: 5px;
+      }
+
+      .note {
+        margin-top: 6px;
       }
     }
   </style>
@@ -81,39 +102,44 @@
 
   <main>
 
-    <!-- 1. stránka z Canvy -->
+    <!-- STRÁNKA 1 -->
     <img
       class="canva"
       src="page-1.png"
       alt="Adéla běží 111 km za mámy samoživitelky"
     >
 
-    <!-- 2. stránka z Canvy -->
-    <img
-      class="canva"
-      src="page-2.png"
-      alt="O projektu"
-    >
+    <!-- STRÁNKA 2 + POČÍTADLO -->
+    <div class="page-two">
 
-    <!-- 3. stránka z Canvy -->
+      <img
+        class="canva"
+        src="page-2.png"
+        alt="O projektu"
+      >
+
+      <section class="counter" aria-label="Vybraná částka">
+
+        <h2>Společně jsme zatím vybrali</h2>
+
+        <div class="amount">
+          <span id="amount">—</span> Kč
+        </div>
+
+        <p class="note">Děkuju za každou pomoc. &lt;3</p>
+
+      </section>
+
+    </div>
+
+    <!-- STRÁNKA 3 -->
     <img
       class="canva"
       src="page-3.png"
       alt="Proč pomáhat maminkám samoživitelkám"
     >
 
-    <!-- POČÍTADLO SBÍRKY -->
-    <section class="counter" aria-label="Vybraná částka">
-      <h2>Společně jsme zatím vybrali</h2>
-
-      <div class="amount">
-        <span id="amount">0</span> Kč
-      </div>
-
-      <p class="note">Děkuju za každou pomoc. &lt;3</p>
-    </section>
-
-    <!-- 4. stránka z Canvy -->
+    <!-- STRÁNKA 4 -->
     <img
       class="canva"
       src="page-4.png"
@@ -126,7 +152,7 @@
     async function updateAmount() {
       try {
         const response = await fetch(
-          "amount.json?time=" + Date.now(),
+          "./amount.json?v=" + Date.now(),
           { cache: "no-store" }
         );
 
@@ -136,24 +162,18 @@
 
         const data = await response.json();
 
-        const value =
-          data.amount ??
-          data.value ??
-          data.total ??
-          0;
+        const value = Number(data.raised || 0);
 
         document.getElementById("amount").textContent =
-          Number(value).toLocaleString("cs-CZ");
+          value.toLocaleString("cs-CZ");
 
       } catch (error) {
-        console.error("Chyba při načítání částky:", error);
+        console.error(error);
         document.getElementById("amount").textContent = "—";
       }
     }
 
     updateAmount();
-
-    // aktualizace částky každou minutu
     setInterval(updateAmount, 60000);
   </script>
 
