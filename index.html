@@ -25,29 +25,29 @@
     }
 
     .label {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    .amount {
-      font-size: clamp(48px, 10vw, 90px);
-      font-weight: 900;
-      line-height: 1;
+      letter-spacing: 1.5px;
       margin-bottom: 12px;
     }
 
-    .goal {
-      font-size: 18px;
-      margin-bottom: 25px;
+    .amount {
+      font-size: 52px;
+      line-height: 1;
+      font-weight: 800;
+      margin-bottom: 10px;
     }
 
-    .bar {
+    .goal {
+      font-size: 17px;
+      margin-bottom: 22px;
+    }
+
+    .progress-wrapper {
       width: 100%;
-      height: 26px;
-      background: #eeeeee;
-      border-radius: 50px;
+      height: 18px;
+      background: #e9e9e9;
+      border-radius: 20px;
       overflow: hidden;
     }
 
@@ -55,14 +55,29 @@
       height: 100%;
       width: 0%;
       background: #829985;
-      border-radius: 50px;
-      transition: width 0.8s ease;
+      border-radius: 20px;
+      transition: width 0.6s ease;
     }
 
     .percent {
       margin-top: 10px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
+      color: #829985;
+    }
+
+    @media (max-width: 600px) {
+      .fundraiser {
+        padding: 25px 18px;
+      }
+
+      .amount {
+        font-size: 42px;
+      }
+
+      .goal {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
@@ -79,11 +94,11 @@
       0 Kč
     </div>
 
-    <div class="goal">
+    <div class="goal" id="goal">
       z cílových 500 000 Kč
     </div>
 
-    <div class="bar">
+    <div class="progress-wrapper">
       <div class="progress" id="progress"></div>
     </div>
 
@@ -94,22 +109,60 @@
   </div>
 
   <script>
-    const goal = 500000;
+    async function updateFundraiser() {
+      try {
+        const response = await fetch(
+          "amount.json?ts=" + Date.now()
+        );
 
-    // Zatím 0 Kč.
-    // Sem později napojíme data transparentního účtu ČSOB.
-    const raised = 0;
+        if (!response.ok) {
+          throw new Error("Nepodařilo se načíst amount.json");
+        }
 
-    const percentage = Math.min((raised / goal) * 100, 100);
+        const data = await response.json();
 
-    document.getElementById("amount").textContent =
-      raised.toLocaleString("cs-CZ") + " Kč";
+        const raised = Number(data.raised) || 0;
+        const goal = Number(data.goal) || 500000;
 
-    document.getElementById("progress").style.width =
-      percentage + "%";
+        const percentage = Math.min(
+          (raised / goal) * 100,
+          100
+        );
 
-    document.getElementById("percent").textContent =
-      Math.round(percentage) + " %";
+        document.getElementById("amount").textContent =
+          raised.toLocaleString("cs-CZ") + " Kč";
+
+        document.getElementById("goal").textContent =
+          "z cílových " +
+          goal.toLocaleString("cs-CZ") +
+          " Kč";
+
+        document.getElementById("progress").style.width =
+          percentage + "%";
+
+        document.getElementById("percent").textContent =
+          percentage.toLocaleString(
+            "cs-CZ",
+            {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2
+            }
+          ) + " %";
+
+      } catch (error) {
+        console.error(
+          "Chyba při načítání částky:",
+          error
+        );
+      }
+    }
+
+    updateFundraiser();
+
+    setInterval(
+      updateFundraiser,
+      60000
+    );
   </script>
 
 </body>
