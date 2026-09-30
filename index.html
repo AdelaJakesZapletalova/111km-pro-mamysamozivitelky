@@ -29,10 +29,7 @@
 
     main {
       width: 100%;
-      max-width: 1366px;
-      margin: 0 auto;
       overflow: hidden;
-      background: #fff;
     }
 
     .canva {
@@ -52,8 +49,8 @@
     .counter {
       position: absolute;
 
-      /* pozice v bílém prostoru */
-      top: 16%;
+      /* TUTO POLOHU UŽ NEMĚNÍME */
+      top: 6%;
       left: 50%;
       transform: translate(-50%, -50%);
 
@@ -76,14 +73,32 @@
       line-height: 1;
     }
 
-    @media (max-width: 600px) {
+    /* Procenta pod částkou */
+    .progress-text {
+      margin-top: 14px;
+      font-size: clamp(14px, 1.5vw, 21px);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 700px) {
       .counter {
-        width: 82%;
-        top: 43%;
+        width: 85%;
       }
 
       .counter h2 {
         margin-bottom: 5px;
+      }
+
+      .progress-text {
+        margin-top: 8px;
+      }
+    }
+
+    @media (min-width: 1500px) {
+      main {
+        max-width: 1800px;
+        margin: auto;
       }
     }
   </style>
@@ -93,14 +108,14 @@
 
   <main>
 
-    <!-- STRÁNKA 1 -->
+    <!-- 1. stránka -->
     <img
       class="canva"
       src="page-1.png"
       alt="Adéla běží 111 km za mámy samoživitelky"
     >
 
-    <!-- STRÁNKA 2 + POČÍTADLO -->
+    <!-- 2. stránka + počítadlo -->
     <div class="page-two">
 
       <img
@@ -113,39 +128,48 @@
 
         <h2>Společně jsme zatím vybrali</h2>
 
-        <div class="amount">
-          <span id="amount">—</span> Kč
+        <div
+          class="amount"
+          id="amount"
+        >
+          0 Kč
+        </div>
+
+        <div
+          class="progress-text"
+          id="progress-text"
+        >
+          0 % z cílových 500 000 Kč
         </div>
 
       </section>
 
     </div>
 
-    <!-- STRÁNKA 3 -->
+    <!-- 3. stránka -->
     <img
       class="canva"
       src="page-3.png"
       alt="Proč pomáhat maminkám samoživitelkám"
     >
 
-    <!-- STRÁNKA 4 -->
+    <!-- 4. stránka -->
     <img
       class="canva"
       src="page-4.png"
-      alt="Nadační fond MÁMY V KAŠI"
+      alt="Nadační fond Mámy v kaši"
     >
 
   </main>
+
 
   <script>
     async function updateAmount() {
       try {
 
         const response = await fetch(
-          "./amount.json?v=" + Date.now(),
-          {
-            cache: "no-store"
-          }
+          "amount.json?t=" + Date.now(),
+          { cache: "no-store" }
         );
 
         if (!response.ok) {
@@ -154,21 +178,71 @@
 
         const data = await response.json();
 
-        const value = Number(data.raised || 0);
+        const raised = Number(data.raised) || 0;
+        const goal = Number(data.goal) || 500000;
 
+        /* Zobrazení vybrané částky */
         document.getElementById("amount").textContent =
-          value.toLocaleString("cs-CZ");
+          new Intl.NumberFormat("cs-CZ", {
+            maximumFractionDigits: 0
+          }).format(raised) + " Kč";
+
+
+        /* Výpočet procent */
+        const percentage =
+          goal > 0
+            ? (raised / goal) * 100
+            : 0;
+
+
+        /*
+          Malé hodnoty ukážeme přesněji.
+          Např.:
+          50 Kč z 500 000 Kč = 0,01 %
+          250 000 Kč = 50 %
+          500 000 Kč = 100 %
+          550 000 Kč = 110 %
+        */
+        let percentageText;
+
+        if (percentage < 1) {
+          percentageText =
+            percentage.toLocaleString("cs-CZ", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+        } else {
+          percentageText =
+            percentage.toLocaleString("cs-CZ", {
+              maximumFractionDigits: 1
+            });
+        }
+
+
+        /* Zobrazení procent a cíle */
+        document.getElementById("progress-text").textContent =
+          percentageText +
+          " % z cílových " +
+          new Intl.NumberFormat("cs-CZ", {
+            maximumFractionDigits: 0
+          }).format(goal) +
+          " Kč";
 
       } catch (error) {
 
         console.error(error);
 
-        document.getElementById("amount").textContent = "—";
+        document.getElementById("amount").textContent = "— Kč";
+
+        document.getElementById("progress-text").textContent =
+          "Cíl 500 000 Kč";
       }
     }
 
+
     updateAmount();
 
+    /* Kontrola nové částky každou minutu */
     setInterval(updateAmount, 60000);
   </script>
 
