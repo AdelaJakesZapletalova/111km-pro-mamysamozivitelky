@@ -50,32 +50,21 @@
     }
 
 
-    /* ========================================
-       POČÍTADLO NA DRUHÉ STRÁNCE
-       ======================================== */
+    /* POČÍTADLO NA DRUHÉ STRÁNCE */
 
     .page-two {
       position: relative;
       width: 100%;
     }
 
-
     .counter {
       position: absolute;
 
-      /*
-        STŘED BÍLÉHO PROSTORU
-        mezi levou kresbou a pravou fotografií
-      */
       top: 11%;
-      left: 58%;
+      left: 50%;
 
       width: 31%;
 
-      /*
-        Přesné vystředění podle bodu výše
-        + zvětšení celého počítadla o 15 %
-      */
       transform: translate(-50%, -50%) scale(1.15);
       transform-origin: center center;
 
@@ -151,8 +140,6 @@
     }
 
 
-    /* VÝPLŇ PROGRESS BARU */
-
     .counter .progress-fill {
       display: block;
 
@@ -165,15 +152,13 @@
     }
 
 
-    /* ========================================
-       MOBIL
-       ======================================== */
+    /* MOBIL */
 
     @media (max-width: 700px) {
 
       .counter {
         top: 11%;
-        left: 58%;
+        left: 50%;
         width: 31%;
 
         transform: translate(-50%, -50%) scale(1.15);
@@ -182,7 +167,6 @@
 
       .counter h2 {
         margin-bottom: 6px;
-
         font-size: clamp(10px, 2.1vw, 18px);
       }
 
@@ -192,14 +176,12 @@
 
       .counter .percentage {
         margin-top: 7px;
-
         font-size: clamp(7px, 1.7vw, 13px);
       }
 
       .counter .progress {
         height: 12px;
         margin-top: 7px;
-
         border-width: 2px !important;
       }
 
@@ -353,8 +335,6 @@
           Number(data.goal) || 500000;
 
 
-        /* ČÁSTKA */
-
         document
           .getElementById("amount")
           .textContent =
@@ -365,8 +345,6 @@
               }
             ) + " Kč";
 
-
-        /* PROCENTA */
 
         const percentage =
           goal > 0
@@ -408,8 +386,6 @@
             + goal.toLocaleString("cs-CZ")
             + " Kč";
 
-
-        /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
