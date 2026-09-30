@@ -164,7 +164,7 @@
     }
 
 
-    /* TLAČÍTKO CHCI PŘISPĚT */
+    /* TLAČÍTKO CHCI PŘISPĚT - VPRAVO */
 
     .donate-button {
       position: fixed;
@@ -191,7 +191,6 @@
       font-weight: 800;
 
       text-decoration: none;
-
       cursor: pointer;
 
       box-shadow:
@@ -204,6 +203,52 @@
 
 
     .donate-button:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.23);
+    }
+
+
+    /* WEB MÁMY V KAŠI - VLEVO */
+
+    .mamy-button {
+      position: fixed;
+
+      left: 24px;
+      bottom: 24px;
+
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 16px 26px;
+
+      background: #D86D49;
+      color: #fff;
+
+      border: none;
+      border-radius: 999px;
+
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+
+      text-decoration: none;
+      cursor: pointer;
+
+      box-shadow:
+        0 5px 18px rgba(0, 0, 0, 0.18);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+
+    .mamy-button:hover {
       transform: translateY(-2px);
 
       box-shadow:
@@ -273,8 +318,22 @@
       }
 
 
+      /* TLAČÍTKO CHCI PŘISPĚT NA MOBILU */
+
       .donate-button {
         right: 14px;
+        bottom: 14px;
+
+        padding: 13px 20px;
+
+        font-size: 14px;
+      }
+
+
+      /* WEB MÁMY V KAŠI NA MOBILU */
+
+      .mamy-button {
+        left: 14px;
         bottom: 14px;
 
         padding: 13px 20px;
@@ -307,7 +366,20 @@
 <body>
 
 
-  <!-- PLOVOUCÍ TLAČÍTKO -->
+  <!-- WEB MÁMY V KAŠI - VLEVO DOLE -->
+
+  <a
+    class="mamy-button"
+    href="https://www.mamyvkasi.cz/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Navštívit web Mámy v kaši"
+  >
+    WEB MÁMY V KAŠI
+  </a>
+
+
+  <!-- CHCI PŘISPĚT - VPRAVO DOLE -->
 
   <a
     class="donate-button"
@@ -458,12 +530,7 @@
 
     /*
       TLAČÍTKO CHCI PŘISPĚT
-
-      QR KÓD JE PŘIBLIŽNĚ V 80 % VÝŠKY
-      TŘETÍHO OBRÁZKU.
-
-      JAVASCRIPT SPOČÍTÁ JEHO SKUTEČNOU
-      POZICI PODLE VELIKOSTI OBRÁZKU.
+      SPOČÍTÁ POZICI QR KÓDU
     */
 
     const donateButton =
@@ -485,7 +552,7 @@
 
 
       /*
-        STŘED QR KÓDU JE CCA V 81 % OBRÁZKU
+        POZICE QR KÓDU NA STRÁNCE 3
       */
 
       const qrPosition =
@@ -493,8 +560,8 @@
 
 
       /*
-        QR POSADÍME ASI 30 % OD HORNÍHO
-        OKRAJE OBRAZOVKY
+        QR POSADÍME PŘIBLIŽNĚ
+        30 % OD HORNÍHO OKRAJE
       */
 
       const targetScroll =
@@ -523,21 +590,11 @@
         event.preventDefault();
 
 
-        /*
-          KDYŽ JE OBRÁZEK UŽ NAČTENÝ,
-          JDEME ROVNOU NA QR.
-        */
-
         if (pageThreeImage.complete) {
 
           scrollToQr();
 
         } else {
-
-          /*
-            KDYŽ JE PAGE-3 JEŠTĚ LAZY-LOADED,
-            POČKÁME NA JEHO NAČTENÍ.
-          */
 
           pageThreeImage.addEventListener(
             "load",
@@ -547,11 +604,6 @@
             }
           );
 
-
-          /*
-            PŘIBLÍŽÍME SE K PAGE 3,
-            ABY PROHLÍŽEČ OBRÁZEK NAČETL.
-          */
 
           pageThreeImage.scrollIntoView({
             behavior: "auto",
@@ -593,6 +645,8 @@
           Number(data.goal) || 500000;
 
 
+        /* ČÁSTKA */
+
         document
           .getElementById("amount")
           .textContent =
@@ -603,6 +657,8 @@
               }
             ) + " Kč";
 
+
+        /* PROCENTA */
 
         const percentage =
           goal > 0
@@ -644,6 +700,8 @@
             + goal.toLocaleString("cs-CZ")
             + " Kč";
 
+
+        /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
@@ -688,6 +746,8 @@
 
     updateAmount();
 
+
+    /* KONTROLA NOVÉ ČÁSTKY KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
