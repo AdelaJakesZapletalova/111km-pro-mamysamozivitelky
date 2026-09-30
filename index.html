@@ -1,218 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Adéla běží 110 km za mámy samoživitelky</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #fff;
-    }
-
-    .website {
-      width: 100%;
-      max-width: 1366px;
-      margin: 0 auto;
-    }
-
-    .page {
-      position: relative;
-      width: 100%;
-      line-height: 0;
-    }
-
-    .page img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    /* ŽIVÉ POČÍTADLO NA STRÁNCE 2 */
-
-    .live-counter {
-      position: absolute;
-
-      /* umístění podle Canva návrhu */
-      left: 47%;
-      top: 33%;
-      width: 39%;
-      height: 26%;
-
-      background: white;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-
-      font-family: Arial, Helvetica, sans-serif;
-      color: #000;
-      line-height: normal;
-      text-align: center;
-    }
-
-    .counter-label {
-      font-size: clamp(8px, 1.15vw, 16px);
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      margin-bottom: 1.2vw;
-    }
-
-    .amount {
-      font-size: clamp(30px, 5vw, 68px);
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 1vw;
-    }
-
-    .goal {
-      font-size: clamp(8px, 1vw, 14px);
-      margin-bottom: 1.6vw;
-      color: #666;
-    }
-
-    .progress-wrapper {
-      width: 84%;
-      height: clamp(5px, 0.75vw, 10px);
-      background: #e8eae8;
-      border-radius: 20px;
-      overflow: hidden;
-    }
-
-    .progress {
-      width: 0%;
-      height: 100%;
-      background: #829985;
-      border-radius: 20px;
-      transition: width 0.6s ease;
-    }
-
-    .percent {
-      margin-top: 0.8vw;
-      font-size: clamp(7px, 0.8vw, 11px);
-      font-weight: 800;
-      color: #000;
-    }
-
-    @media (max-width: 600px) {
-      .live-counter {
-        left: 45%;
-        width: 43%;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adéla běží 111 km za mámy samoživitelky</title>
+<meta name="description" content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí.">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#111}
+body{font-family:Arial,Helvetica,sans-serif}
+main{width:100%;overflow:hidden}
+.canva{display:block;width:100%;height:auto;margin:0}
+.counter{
+  padding:42px 20px 48px;text-align:center;background:#fff;
+  border-top:1px solid #eee;border-bottom:1px solid #eee
+}
+.counter h2{margin:0 0 10px;font-size:clamp(22px,3vw,38px)}
+.amount{font-size:clamp(42px,8vw,92px);font-weight:800;line-height:1}
+.note{margin-top:12px;font-size:15px}
+@media(min-width:1500px){
+  main{max-width:1800px;margin:auto}
+}
+</style>
 </head>
-
 <body>
-
-  <main class="website">
-
-    <!-- CANVA STRÁNKA 1 -->
-    <div class="page">
-      <img src="1.png" alt="Adéla běží 110 km za mámy samoživitelky">
-    </div>
-
-    <!-- CANVA STRÁNKA 2 + ŽIVÉ POČÍTADLO -->
-    <div class="page">
-
-      <img src="2.png" alt="Sbírka pro Mámy v kaši">
-
-      <div class="live-counter">
-
-        <div class="counter-label">
-          VYBRÁNO PRO MÁMY V KÁŠI
-        </div>
-
-        <div class="amount" id="amount">
-          0 Kč
-        </div>
-
-        <div class="goal" id="goal">
-          z cílových 500 000 Kč
-        </div>
-
-        <div class="progress-wrapper">
-          <div class="progress" id="progress"></div>
-        </div>
-
-        <div class="percent" id="percent">
-          0 % SPLNĚNO
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- CANVA STRÁNKA 3 -->
-    <div class="page">
-      <img src="3.png" alt="Proč sbírka pomáhá">
-    </div>
-
-    <!-- CANVA STRÁNKA 4 -->
-    <div class="page">
-      <img src="4.png" alt="Jak přispět">
-    </div>
-
-  </main>
-
-
-  <script>
-    async function updateFundraiser() {
-      try {
-        const response = await fetch(
-          "amount.json?ts=" + Date.now()
-        );
-
-        if (!response.ok) {
-          throw new Error("Nepodařilo se načíst amount.json");
-        }
-
-        const data = await response.json();
-
-        const raised = Number(data.raised) || 0;
-        const goal = Number(data.goal) || 500000;
-
-        const percentage = Math.min(
-          (raised / goal) * 100,
-          100
-        );
-
-        document.getElementById("amount").textContent =
-          raised.toLocaleString("cs-CZ") + " Kč";
-
-        document.getElementById("goal").textContent =
-          "z cílových " +
-          goal.toLocaleString("cs-CZ") +
-          " Kč";
-
-        document.getElementById("progress").style.width =
-          percentage + "%";
-
-        document.getElementById("percent").textContent =
-          percentage.toLocaleString(
-            "cs-CZ",
-            {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2
-            }
-          ) + " % SPLNĚNO";
-
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    updateFundraiser();
-    setInterval(updateFundraiser, 60000);
-  </script>
-
+<main>
+  <img class="canva" src="01-uvod.png" alt="Adéla běží 111 km za mámy samoživitelky">
+  <img class="canva" src="02-o-projektu.png" alt="O projektu">
+  <img class="canva" src="03-proc-pomahat.png" alt="Proč pomáhat maminkám samoživitelkám">
+  <section class="counter" aria-label="Vybraná částka">
+    <h2>Společně jsme zatím vybrali</h2>
+    <div class="amount"><span id="amount">0</span> Kč</div>
+    <div class="note">Děkuju za každou pomoc.</div>
+  </section>
+  <img class="canva" src="04-nadacni-fond.png" alt="Nadační fond MÁMY V KAŠI">
+</main>
+<script>
+async function updateAmount(){
+  try{
+    const r=await fetch('amount.json?ts='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error();
+    const d=await r.json();
+    const value=Number(d.amount ?? d.castka ?? d.value ?? 0);
+    document.getElementById('amount').textContent =
+      new Intl.NumberFormat('cs-CZ').format(value);
+  }catch(e){
+    document.getElementById('amount').textContent='0';
+  }
+}
+updateAmount();
+setInterval(updateAmount,60000);
+</script>
 </body>
 </html>
