@@ -26,22 +26,46 @@ jobs:
           import requests
           from datetime import datetime, timezone
 
-          URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
+          PAGE_URL = "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
+          API_URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
+
           ACCOUNT = 377658515
           START_DATE = "2026-09-30"
           GOAL = 500000
 
           today = datetime.now(timezone.utc).date().isoformat()
 
-          headers = {
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-              "User-Agent": "Mozilla/5.0",
-              "Origin": "https://www.csob.cz",
-              "Referer": "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
+          session = requests.Session()
+
+          browser_headers = {
+              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+              "Accept-Language": "cs-CZ,cs;q=0.9"
           }
 
-          session = requests.Session()
+          print("Oteviram verejnou stranku CSOB...")
+
+          page_response = session.get(
+              PAGE_URL,
+              headers=browser_headers,
+              timeout=30,
+              allow_redirects=True
+          )
+
+          page_response.raise_for_status()
+
+          print("Stranka CSOB:", page_response.status_code)
+          print("Cookies:", len(session.cookies))
+
+          api_headers = {
+              "Accept": "application/json, text/plain, */*",
+              "Content-Type": "application/json",
+              "User-Agent": browser_headers["User-Agent"],
+              "Accept-Language": "cs-CZ,cs;q=0.9",
+              "Origin": "https://www.csob.cz",
+              "Referer": PAGE_URL,
+              "X-Security-Request": "required"
+          }
+
           raised = 0.0
           page = 1
 
@@ -77,37 +101,55 @@ jobs:
                   ]
               }
 
+              print("Nacitam stranu:", page)
+
               response = session.post(
-                  URL,
+                  API_URL,
                   json=payload,
-                  headers=headers,
+                  headers=api_headers,
                   timeout=30,
                   allow_redirects=True
               )
 
               print("HTTP:", response.status_code)
-              print("URL:", response.url)
+              print("Finalni URL:", response.url)
 
               response.raise_for_status()
+
               result = response.json()
 
-              transactions = result.get("accountedTransaction", [])
+              transactions = result.get(
+                  "accountedTransaction",
+                  []
+              )
 
               for transaction in transactions:
-                  amount_data = (
-                      transaction
-                      .get("baseInfo", {})
-                      .get("accountAmountData", {})
+                  base_info = transaction.get(
+                      "baseInfo",
+                      {}
                   )
 
-                  amount = float(amount_data.get("amount", 0) or 0)
-                  currency = amount_data.get("currencyCode")
+                  amount_data = base_info.get(
+                      "accountAmountData",
+                      {}
+                  )
+
+                  amount = float(
+                      amount_data.get("amount", 0) or 0
+                  )
+
+                  currency = amount_data.get(
+                      "currencyCode"
+                  )
 
                   if amount > 0 and currency == "CZK":
                       raised += amount
 
               paging = result.get("paging", {})
-              page_count = int(paging.get("pageCount", 1) or 1)
+
+              page_count = int(
+                  paging.get("pageCount", 1) or 1
+              )
 
               if page >= page_count:
                   break
@@ -119,11 +161,20 @@ jobs:
               "goal": GOAL
           }
 
-          with open("amount.json", "w", encoding="utf-8") as f:
-              json.dump(output, f, ensure_ascii=False, indent=2)
-              f.write("\n")
+          with open(
+              "amount.json",
+              "w",
+              encoding="utf-8"
+          ) as file:
+              json.dump(
+                  output,
+                  file,
+                  ensure_ascii=False,
+                  indent=2
+              )
+              file.write("\n")
 
-          print("Vysledek:", output)
+          print("HOTOVO:", output)
 
       - name: Ulozit novou castku
         run: |
