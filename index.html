@@ -56,6 +56,18 @@
       padding: 0;
     }
 
+    /*
+      Dokud se odložený obrázek nenačte,
+      držíme pro stránku místo.
+      Poměr odpovídá obrázku Canva.
+    */
+
+    .lazy-page-image {
+      aspect-ratio: 2846 / 1600;
+      object-fit: contain;
+      background: #fff;
+    }
+
     .page-two {
       position: relative;
       width: 100%;
@@ -77,8 +89,10 @@
 
     .counter {
       position: absolute;
+
       top: calc(15% + 2cm);
       left: calc(50% + 1cm);
+
       width: 31%;
 
       transform: translate(-50%, -50%) scale(1.15);
@@ -89,7 +103,7 @@
     }
 
 
-    /* NADPIS POČÍTADLA - ČERNÝ */
+    /* NADPIS - ČERNÝ */
 
     .counter h2 {
       margin: 0 0 12px 0;
@@ -181,10 +195,11 @@
     }
 
 
-    /* TLAČÍTKO CHCI PŘISPĚT */
+    /* CHCI PŘISPĚT */
 
     .donate-button {
       position: fixed;
+
       right: 24px;
       bottom: 24px;
 
@@ -222,10 +237,11 @@
     }
 
 
-    /* TLAČÍTKO WEB NADAČNÍHO FONDU */
+    /* WEB NADAČNÍHO FONDU */
 
     .mamy-button {
       position: fixed;
+
       left: 24px;
       bottom: 24px;
 
@@ -281,6 +297,7 @@
 
     .route-map iframe {
       display: block;
+
       width: 100%;
       height: 100%;
 
@@ -397,7 +414,7 @@
   <main>
 
 
-    <!-- STRÁNKA 1 -->
+    <!-- STRÁNKA 1 - NAČTE SE HNED -->
 
     <div class="page">
 
@@ -413,16 +430,14 @@
     </div>
 
 
-    <!-- STRÁNKA 2 + POČÍTADLO -->
+    <!-- STRÁNKA 2 - ODLOŽENÉ NAČTENÍ -->
 
     <div class="page page-two">
 
       <img
-        class="canva"
-        src="page-2 (1).png"
+        class="canva lazy-page-image"
+        data-src="page-2 (1).png"
         alt="O projektu"
-        loading="lazy"
-        fetchpriority="low"
         decoding="async"
       >
 
@@ -475,7 +490,7 @@
     </div>
 
 
-    <!-- STRÁNKA 3 -->
+    <!-- STRÁNKA 3 - ODLOŽENÉ NAČTENÍ -->
 
     <div
       class="page page-three"
@@ -483,28 +498,24 @@
     >
 
       <img
-        class="canva"
+        class="canva lazy-page-image"
         id="page-three-image"
-        src="page-3 (1).png"
+        data-src="page-3 (1).png"
         alt="Proč pomáhat maminkám samoživitelkám"
-        loading="lazy"
-        fetchpriority="low"
         decoding="async"
       >
 
     </div>
 
 
-    <!-- STRÁNKA 4 -->
+    <!-- STRÁNKA 4 - ODLOŽENÉ NAČTENÍ -->
 
     <div class="page page-four">
 
       <img
-        class="canva"
-        src="page-4 (1).png"
+        class="canva lazy-page-image"
+        data-src="page-4 (1).png"
         alt="Nadační fond Mámy v kaši"
-        loading="lazy"
-        fetchpriority="low"
         decoding="async"
       >
 
@@ -525,13 +536,113 @@
 
   <script>
 
-    /* CHCI PŘISPĚT */
+    /* =========================================
+       POSTUPNÉ NAČÍTÁNÍ STRÁNEK 2–4
+       ========================================= */
+
+    const lazyImages =
+      document.querySelectorAll(
+        "img[data-src]"
+      );
+
+
+    function loadLazyImage(image) {
+
+      if (!image || image.src) {
+        return;
+      }
+
+      const source =
+        image.dataset.src;
+
+      if (!source) {
+        return;
+      }
+
+      image.src = source;
+
+      image.removeAttribute(
+        "data-src"
+      );
+
+    }
+
+
+    if ("IntersectionObserver" in window) {
+
+      const imageObserver =
+        new IntersectionObserver(
+
+          function(entries, observer) {
+
+            entries.forEach(
+              function(entry) {
+
+                if (entry.isIntersecting) {
+
+                  loadLazyImage(
+                    entry.target
+                  );
+
+                  observer.unobserve(
+                    entry.target
+                  );
+
+                }
+
+              }
+            );
+
+          },
+
+          {
+            rootMargin: "600px 0px"
+          }
+
+        );
+
+
+      lazyImages.forEach(
+        function(image) {
+
+          imageObserver.observe(
+            image
+          );
+
+        }
+      );
+
+
+    } else {
+
+      lazyImages.forEach(
+        function(image) {
+
+          loadLazyImage(
+            image
+          );
+
+        }
+      );
+
+    }
+
+
+
+    /* =========================================
+       CHCI PŘISPĚT
+       ========================================= */
 
     const donateButton =
-      document.getElementById("donate-button");
+      document.getElementById(
+        "donate-button"
+      );
+
 
     const pageThreeImage =
-      document.getElementById("page-three-image");
+      document.getElementById(
+        "page-three-image"
+      );
 
 
     function scrollToQr() {
@@ -539,19 +650,26 @@
       const imageRect =
         pageThreeImage.getBoundingClientRect();
 
+
       const imageTop =
         window.scrollY + imageRect.top;
 
+
       const qrPosition =
-        imageTop + (imageRect.height * 0.81);
+        imageTop +
+        (imageRect.height * 0.81);
+
 
       const targetScroll =
-        qrPosition - (window.innerHeight * 0.30);
+        qrPosition -
+        (window.innerHeight * 0.30);
+
 
       window.scrollTo({
         top: targetScroll,
         behavior: "smooth"
       });
+
 
       history.replaceState(
         null,
@@ -567,6 +685,17 @@
       function(event) {
 
         event.preventDefault();
+
+
+        /*
+          Pokud ještě stránka 3 není načtená,
+          načteme ji okamžitě.
+        */
+
+        loadLazyImage(
+          pageThreeImage
+        );
+
 
         if (
           pageThreeImage.complete &&
@@ -585,21 +714,22 @@
             }
           );
 
-          pageThreeImage.scrollIntoView({
-            behavior: "auto",
-            block: "center"
-          });
-
         }
 
       }
     );
 
 
-    /* MAPA */
+
+    /* =========================================
+       MAPA - NAČTE SE AŽ DOLE
+       ========================================= */
 
     const routeMap =
-      document.getElementById("route-map");
+      document.getElementById(
+        "route-map"
+      );
+
 
     let mapLoaded = false;
 
@@ -610,24 +740,35 @@
         return;
       }
 
+
       mapLoaded = true;
 
+
       const iframe =
-        document.createElement("iframe");
+        document.createElement(
+          "iframe"
+        );
+
 
       iframe.src =
         "https://mapy.com/s/fomobopetu";
 
+
       iframe.title =
         "Trasa 111 km Brdami";
+
 
       iframe.loading =
         "lazy";
 
+
       iframe.allowFullscreen =
         true;
 
-      routeMap.appendChild(iframe);
+
+      routeMap.appendChild(
+        iframe
+      );
 
     }
 
@@ -642,9 +783,12 @@
             entries.forEach(
               function(entry) {
 
-                if (entry.isIntersecting) {
+                if (
+                  entry.isIntersecting
+                ) {
 
                   loadMap();
+
                   observer.disconnect();
 
                 }
@@ -660,7 +804,11 @@
 
         );
 
-      mapObserver.observe(routeMap);
+
+      mapObserver.observe(
+        routeMap
+      );
+
 
     } else {
 
@@ -669,18 +817,24 @@
     }
 
 
-    /* POČÍTADLO */
+
+    /* =========================================
+       POČÍTADLO
+       ========================================= */
 
     async function updateAmount() {
 
       try {
 
-        const response = await fetch(
-          "./amount.json?time=" + Date.now(),
-          {
-            cache: "no-store"
-          }
-        );
+        const response =
+          await fetch(
+            "./amount.json?time=" +
+            Date.now(),
+            {
+              cache: "no-store"
+            }
+          );
+
 
         if (!response.ok) {
 
@@ -690,14 +844,18 @@
 
         }
 
+
         const data =
           await response.json();
+
 
         const raised =
           Number(data.raised) || 0;
 
+
         const goal =
           Number(data.goal) || 500000;
+
 
 
         /* ČÁSTKA */
@@ -713,6 +871,7 @@
             ) + " Kč";
 
 
+
         /* PROCENTA */
 
         const percentage =
@@ -720,14 +879,17 @@
             ? (raised / goal) * 100
             : 0;
 
+
         let percentageText;
+
 
         if (
           percentage > 0 &&
           percentage < 0.01
         ) {
 
-          percentageText = "< 0,01";
+          percentageText =
+            "< 0,01";
 
         } else {
 
@@ -736,30 +898,43 @@
               "cs-CZ",
               {
                 minimumFractionDigits:
-                  percentage < 1 ? 2 : 0,
+                  percentage < 1
+                    ? 2
+                    : 0,
 
-                maximumFractionDigits: 2
+                maximumFractionDigits:
+                  2
               }
             );
 
         }
 
+
         document
-          .getElementById("percentage")
+          .getElementById(
+            "percentage"
+          )
           .textContent =
             percentageText
             + " % z cílových "
-            + goal.toLocaleString("cs-CZ")
+            + goal.toLocaleString(
+                "cs-CZ"
+              )
             + " Kč";
+
 
 
         /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
-            Math.max(percentage, 0),
+            Math.max(
+              percentage,
+              0
+            ),
             100
           );
+
 
         const visibleBarPercentage =
           realBarPercentage > 0
@@ -769,10 +944,14 @@
               )
             : 0;
 
+
         document
-          .getElementById("progress-fill")
+          .getElementById(
+            "progress-fill"
+          )
           .style.width =
-            visibleBarPercentage + "%";
+            visibleBarPercentage
+            + "%";
 
 
       } catch (error) {
@@ -782,13 +961,19 @@
           error
         );
 
+
         document
-          .getElementById("amount")
+          .getElementById(
+            "amount"
+          )
           .textContent =
             "— Kč";
 
+
         document
-          .getElementById("percentage")
+          .getElementById(
+            "percentage"
+          )
           .textContent =
             "Cíl 500 000 Kč";
 
@@ -798,6 +983,7 @@
 
 
     updateAmount();
+
 
     setInterval(
       updateAmount,
