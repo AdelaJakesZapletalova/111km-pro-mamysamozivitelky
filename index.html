@@ -12,6 +12,7 @@
     content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí."
   >
 
+  <!-- První Canva stránka má nejvyšší prioritu -->
   <link
     rel="preload"
     as="image"
@@ -65,7 +66,17 @@
     }
 
 
-    /* TŘETÍ STRÁNKA */
+    /* TŘETÍ A ČTVRTÁ STRÁNKA
+       Prohlížeč nemusí hned vykreslovat obsah,
+       který je hluboko pod obrazovkou.
+    */
+
+    .page-three,
+    .page-four {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 2000px;
+    }
+
 
     .page-three {
       position: relative;
@@ -260,9 +271,16 @@
 
     .route-map {
       width: 100%;
+      height: 70vh;
+      min-height: 500px;
+
       margin: 0;
       padding: 0;
+
       background: #fff;
+
+      content-visibility: auto;
+      contain-intrinsic-size: 500px;
     }
 
 
@@ -270,8 +288,7 @@
       display: block;
 
       width: 100%;
-      height: 70vh;
-      min-height: 500px;
+      height: 100%;
 
       margin: 0;
       padding: 0;
@@ -342,7 +359,7 @@
       }
 
 
-      .route-map iframe {
+      .route-map {
         height: 60vh;
         min-height: 420px;
       }
@@ -366,7 +383,7 @@
 <body>
 
 
-  <!-- WEB NADAČNÍHO FONDU - VLEVO DOLE -->
+  <!-- WEB NADAČNÍHO FONDU -->
 
   <a
     class="mamy-button"
@@ -379,7 +396,7 @@
   </a>
 
 
-  <!-- CHCI PŘISPĚT - VPRAVO DOLE -->
+  <!-- CHCI PŘISPĚT -->
 
   <a
     class="donate-button"
@@ -395,7 +412,9 @@
   <main>
 
 
-    <!-- STRÁNKA 1 -->
+    <!-- STRÁNKA 1
+         Načítá se okamžitě.
+    -->
 
     <div class="page">
 
@@ -412,7 +431,9 @@
 
 
 
-    <!-- STRÁNKA 2 + POČÍTADLO -->
+    <!-- STRÁNKA 2
+         Prohlížeč ji načte podle potřeby.
+    -->
 
     <div class="page page-two">
 
@@ -421,6 +442,7 @@
         src="page-2.png"
         alt="O projektu"
         loading="lazy"
+        fetchpriority="low"
         decoding="async"
       >
 
@@ -482,6 +504,7 @@
         src="page-3.png"
         alt="Proč pomáhat maminkám samoživitelkám"
         loading="lazy"
+        fetchpriority="low"
         decoding="async"
       >
 
@@ -491,13 +514,14 @@
 
     <!-- STRÁNKA 4 -->
 
-    <div class="page">
+    <div class="page page-four">
 
       <img
         class="canva"
         src="page-4.png"
         alt="Nadační fond Mámy v kaši"
         loading="lazy"
+        fetchpriority="low"
         decoding="async"
       >
 
@@ -505,21 +529,24 @@
 
 
 
-    <!-- MAPA ÚPLNĚ DOLE -->
+    <!--
+      MAPA
+
+      POZOR:
+      NENÍ TU IFRAME SE SRC.
+
+      Mapy.com se tedy při otevření webu
+      vůbec nestahují.
+
+      JavaScript iframe vytvoří až tehdy,
+      když se uživatel přiblíží k mapě.
+    -->
 
     <section
       class="route-map"
+      id="route-map"
       aria-label="Mapa trasy 111 km"
-    >
-
-      <iframe
-        src="https://mapy.com/s/fomobopetu"
-        title="Trasa 111 km Brdami"
-        loading="lazy"
-        allowfullscreen
-      ></iframe>
-
-    </section>
+    ></section>
 
 
   </main>
@@ -528,10 +555,9 @@
 
   <script>
 
-    /*
-      TLAČÍTKO CHCI PŘISPĚT
-      SPOČÍTÁ POZICI QR KÓDU
-    */
+    /* =========================================
+       CHCI PŘISPĚT
+       ========================================= */
 
     const donateButton =
       document.getElementById("donate-button");
@@ -552,7 +578,7 @@
 
 
       /*
-        POZICE QR KÓDU NA STRÁNCE 3
+        POZICE QR KÓDU V PAGE-3.PNG
       */
 
       const qrPosition =
@@ -560,8 +586,8 @@
 
 
       /*
-        QR POSADÍME PŘIBLIŽNĚ
-        30 % OD HORNÍHO OKRAJE
+        QR BUDE PŘIBLIŽNĚ 30 %
+        OD HORNÍHO OKRAJE OBRAZOVKY
       */
 
       const targetScroll =
@@ -590,7 +616,10 @@
         event.preventDefault();
 
 
-        if (pageThreeImage.complete) {
+        if (
+          pageThreeImage.complete &&
+          pageThreeImage.naturalHeight > 0
+        ) {
 
           scrollToQr();
 
@@ -605,6 +634,11 @@
           );
 
 
+          /*
+            Lazy obrázek se tímto dostane
+            do blízkosti viewportu a načte se.
+          */
+
           pageThreeImage.scrollIntoView({
             behavior: "auto",
             block: "center"
@@ -617,7 +651,104 @@
 
 
 
-    /* POČÍTADLO */
+    /* =========================================
+       MAPA - OPRAVDOVÉ ODLOŽENÉ NAČTENÍ
+       ========================================= */
+
+    const routeMap =
+      document.getElementById("route-map");
+
+
+    let mapLoaded = false;
+
+
+    function loadMap() {
+
+      if (mapLoaded) {
+        return;
+      }
+
+
+      mapLoaded = true;
+
+
+      const iframe =
+        document.createElement("iframe");
+
+
+      iframe.src =
+        "https://mapy.com/s/fomobopetu";
+
+
+      iframe.title =
+        "Trasa 111 km Brdami";
+
+
+      iframe.loading =
+        "lazy";
+
+
+      iframe.allowFullscreen =
+        true;
+
+
+      routeMap.appendChild(iframe);
+
+    }
+
+
+    /*
+      Mapu začneme načítat až když je
+      uživatel přibližně 800 px od ní.
+    */
+
+    if ("IntersectionObserver" in window) {
+
+      const mapObserver =
+        new IntersectionObserver(
+
+          function(entries, observer) {
+
+            entries.forEach(
+              function(entry) {
+
+                if (entry.isIntersecting) {
+
+                  loadMap();
+
+                  observer.disconnect();
+
+                }
+
+              }
+            );
+
+          },
+
+          {
+            rootMargin: "800px 0px"
+          }
+
+        );
+
+
+      mapObserver.observe(routeMap);
+
+    } else {
+
+      /*
+        Fallback pro starší prohlížeče.
+      */
+
+      loadMap();
+
+    }
+
+
+
+    /* =========================================
+       POČÍTADLO
+       ========================================= */
 
     async function updateAmount() {
 
@@ -632,17 +763,23 @@
 
 
         if (!response.ok) {
-          throw new Error("Nepodařilo se načíst amount.json");
+          throw new Error(
+            "Nepodařilo se načíst amount.json"
+          );
         }
 
 
-        const data = await response.json();
+        const data =
+          await response.json();
+
 
         const raised =
           Number(data.raised) || 0;
 
+
         const goal =
           Number(data.goal) || 500000;
+
 
 
         /* ČÁSTKA */
@@ -656,6 +793,7 @@
                 maximumFractionDigits: 0
               }
             ) + " Kč";
+
 
 
         /* PROCENTA */
@@ -701,6 +839,7 @@
             + " Kč";
 
 
+
         /* PROGRESS BAR */
 
         const realBarPercentage =
@@ -710,9 +849,17 @@
           );
 
 
+        /*
+          U MALÉ ČÁSTKY UKÁŽEME
+          MINIMÁLNĚ 1,5 % PRUHU.
+        */
+
         const visibleBarPercentage =
           realBarPercentage > 0
-            ? Math.max(realBarPercentage, 1.5)
+            ? Math.max(
+                realBarPercentage,
+                1.5
+              )
             : 0;
 
 
@@ -732,22 +879,26 @@
 
         document
           .getElementById("amount")
-          .textContent = "— Kč";
+          .textContent =
+            "— Kč";
 
 
         document
           .getElementById("percentage")
-          .textContent = "Cíl 500 000 Kč";
+          .textContent =
+            "Cíl 500 000 Kč";
 
       }
 
     }
 
 
+    /* PRVNÍ NAČTENÍ ČÁSTKY */
+
     updateAmount();
 
 
-    /* KONTROLA NOVÉ ČÁSTKY KAŽDOU MINUTU */
+    /* AKTUALIZACE KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
