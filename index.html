@@ -4,50 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>110 km pro Mámy v kaši</title>
+
   <style>
     * {
       box-sizing: border-box;
     }
 
-    body {
-      margin: 0;
-      background: white;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #000;
+    html {
+      scroll-behavior: smooth;
     }
 
-    .fundraiser {
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    .page {
       width: 100%;
+      overflow: hidden;
+    }
+
+    /* HERO */
+
+    .hero {
+      text-align: center;
+      padding: 70px 24px 45px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -3px;
+    }
+
+    .hero h1 span {
+      display: block;
+    }
+
+    .brdy {
+      margin-top: 22px;
+      font-size: clamp(26px, 4vw, 46px);
+      font-weight: 400;
+      letter-spacing: 8px;
+    }
+
+    .date {
+      margin-top: 16px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    /* LIVE COUNTER */
+
+    .counter-section {
       max-width: 900px;
       margin: 0 auto;
-      padding: 30px 25px;
+      padding: 35px 24px 60px;
       text-align: center;
     }
 
-    .label {
+    .counter-label {
       font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      margin-bottom: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
     }
 
     .amount {
-      font-size: 52px;
+      font-size: clamp(48px, 8vw, 76px);
       line-height: 1;
-      font-weight: 800;
-      margin-bottom: 10px;
+      font-weight: 900;
+      margin-bottom: 12px;
     }
 
     .goal {
       font-size: 17px;
-      margin-bottom: 22px;
+      margin-bottom: 25px;
     }
 
     .progress-wrapper {
       width: 100%;
       height: 18px;
       background: #e9e9e9;
-      border-radius: 20px;
+      border-radius: 30px;
       overflow: hidden;
     }
 
@@ -55,28 +101,107 @@
       height: 100%;
       width: 0%;
       background: #829985;
-      border-radius: 20px;
-      transition: width 0.6s ease;
+      border-radius: 30px;
+      transition: width 0.8s ease;
     }
 
     .percent {
       margin-top: 10px;
-      font-size: 16px;
-      font-weight: 700;
       color: #829985;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    /* TEXT */
+
+    .content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 30px 25px 80px;
+    }
+
+    .content section {
+      margin-bottom: 55px;
+    }
+
+    .content h2 {
+      font-size: 16px;
+      letter-spacing: 2px;
+      font-weight: 900;
+      margin: 0 0 18px;
+    }
+
+    .content p {
+      font-size: 18px;
+      margin: 0 0 18px;
+    }
+
+    .content strong {
+      font-weight: 800;
+    }
+
+    /* DONATION */
+
+    .donation {
+      background: #f2f4f1;
+      padding: 65px 24px;
+      text-align: center;
+    }
+
+    .donation-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .donation h2 {
+      margin: 0 0 20px;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .donation p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+
+    .account {
+      margin-top: 25px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .bank-button {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 15px 26px;
+      background: #829985;
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+      border-radius: 30px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 14px;
     }
 
     @media (max-width: 600px) {
-      .fundraiser {
-        padding: 25px 18px;
+      .hero {
+        padding-top: 50px;
       }
 
-      .amount {
-        font-size: 42px;
+      .hero h1 {
+        letter-spacing: -2px;
       }
 
-      .goal {
-        font-size: 15px;
+      .content p {
+        font-size: 17px;
+      }
+
+      .counter-section {
+        padding-bottom: 45px;
       }
     }
   </style>
@@ -84,9 +209,28 @@
 
 <body>
 
-  <div class="fundraiser">
+<div class="page">
 
-    <div class="label">
+  <header class="hero">
+
+    <h1>
+      <span>110 KM</span>
+      <span>PRO MÁMY</span>
+      <span>V KAŠI</span>
+    </h1>
+
+    <div class="brdy">BRDY</div>
+
+    <div class="date">
+      6. LISTOPADU 2026
+    </div>
+
+  </header>
+
+
+  <section class="counter-section">
+
+    <div class="counter-label">
       VYBRÁNO PRO MÁMY V KÁŠI
     </div>
 
@@ -106,64 +250,236 @@
       0 %
     </div>
 
-  </div>
+  </section>
 
-  <script>
-    async function updateFundraiser() {
-      try {
-        const response = await fetch(
-          "amount.json?ts=" + Date.now()
-        );
 
-        if (!response.ok) {
-          throw new Error("Nepodařilo se načíst amount.json");
-        }
+  <main class="content">
 
-        const data = await response.json();
+    <section>
+      <h2>O CO JDE</h2>
 
-        const raised = Number(data.raised) || 0;
-        const goal = Number(data.goal) || 500000;
+      <p>
+        Jmenuji se Adéla Jakeš Zapletalová a 6. listopadu 2026
+        poběžím 110 kilometrů Brdama s převýšením přes 3 000 metrů.
+      </p>
 
-        const percentage = Math.min(
-          (raised / goal) * 100,
-          100
-        );
+      <p>
+        Letošní běh chci spojit se sbírkou pro mámy samoživitelky
+        a jejich děti.
+      </p>
+    </section>
 
-        document.getElementById("amount").textContent =
-          raised.toLocaleString("cs-CZ") + " Kč";
 
-        document.getElementById("goal").textContent =
-          "z cílových " +
-          goal.toLocaleString("cs-CZ") +
-          " Kč";
+    <section>
+      <h2>PROČ PRÁVĚ PRO NĚ</h2>
 
-        document.getElementById("progress").style.width =
-          percentage + "%";
+      <p>
+        Sama jako máma čím dál víc vnímám, jak náročná a proměnlivá
+        role rodičovství je. Po všech stránkách. Osobní prostor se
+        zmenší a člověk se tak trochu stane principálem všeho.
+      </p>
 
-        document.getElementById("percent").textContent =
-          percentage.toLocaleString(
-            "cs-CZ",
-            {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2
-            }
-          ) + " %";
+      <p>
+        Každý den si uvědomuju, jak zásadní je, že na to nejsem sama.
+      </p>
 
-      } catch (error) {
-        console.error(
-          "Chyba při načítání částky:",
-          error
-        );
+      <p>
+        Pro mnoho žen je ale každodenní realita jiná.
+        Tuhle zátěž nesou samy.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>PROČ JE POMOC POTŘEBA</h2>
+
+      <p>
+        V Česku patří domácnosti jednoho rodiče s dětmi dlouhodobě
+        k těm ekonomicky nejzranitelnějším. Podle nejnovějších údajů
+        Českého statistického úřadu je příjmovou chudobou ohroženo
+        <strong>34,1 % těchto domácností</strong>.
+        V celé populaci je to <strong>9,6 %</strong>.
+      </p>
+
+      <p>
+        A finanční stránka je jen jedna část.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>KDYŽ JE NA VŠECHNO JEDEN ČLOVĚK</h2>
+
+      <p>
+        Když je na rodinu jen jeden rodič, zůstává běžný provoz jen
+        na něm. Práce, nákupy, vaření, škola, lékaři, nemoci, úkoly,
+        kroužky, domácnost, plánování. I starost, jestli rodina vyjde
+        příští měsíc.
+      </p>
+
+      <p>
+        A to všechno bere nejen čas, ale hlavně kapacitu. Kapacitu
+        na trpělivost, nastavování zdravých hranic, zvládání vlastních
+        emocí i emocí dětí. Na zájem, hraní, společný čas a podporu
+        jejich rozvoje. A taky na to neztratit při tom všem sám sebe.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>DĚTI POTŘEBUJÍ VÍC NEŽ MATERIÁLNÍ ZAJIŠTĚNÍ</h2>
+
+      <p>
+        Potřebují vztah a pozornost rodiče, který má dost prostoru
+        být skutečně napojený na jejich potřeby.
+      </p>
+
+      <p>
+        A podle mě potřebují taky vidět, že jejich máma může být
+        spokojená a šťastná. Že její život nespočívá jen v tom,
+        aby všechno vydržela a zvládla.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>KOMU SBÍRKA POMŮŽE</h2>
+
+      <p>
+        Proto jsem letošní běh spojila s Nadačním fondem
+        <strong>MÁMY V KAŠI</strong>. Pomáhá samoživitelkám a
+        neúplným rodinám materiálně a finančně a podle konkrétní
+        situace zprostředkovává také sociální, psychologickou
+        nebo právní pomoc.
+      </p>
+
+      <p>
+        Výtěžek sbírky půjde právě jim.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>PROČ MÁ SMYSL PŘISPĚT</h2>
+
+      <p>
+        Nejde o obdiv ani o lítost. Jde o konkrétní pomoc ve chvíli,
+        kdy vlastní možnosti nestačí.
+      </p>
+
+      <p>
+        I menší pomoc může znamenat, že jedna máma nebude muset řešit,
+        co tento měsíc nezaplatí. Že získá trochu prostoru.
+      </p>
+
+      <p>
+        <strong>Pro svoje děti i pro sebe.</strong>
+      </p>
+
+      <p>Adéla</p>
+    </section>
+
+  </main>
+
+
+  <section class="donation">
+
+    <div class="donation-inner">
+
+      <h2>PŘISPĚJ</h2>
+
+      <p>
+        Pošli libovolnou částku přímo Nadačnímu fondu Mámy v kaši.
+      </p>
+
+      <p>
+        Každá koruna míří přímo nadačnímu fondu. ❤️
+      </p>
+
+      <div class="account">
+        377658515/0300
+      </div>
+
+      <a
+        class="bank-button"
+        href="https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
+        target="_blank"
+        rel="noopener"
+      >
+        TRANSPARENTNÍ ÚČET
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <footer>
+    Za ilustrace děkuju Beata Alexová × MURA cycling. 🤍
+  </footer>
+
+</div>
+
+
+<script>
+  async function updateFundraiser() {
+    try {
+
+      const response = await fetch(
+        "amount.json?ts=" + Date.now()
+      );
+
+      if (!response.ok) {
+        throw new Error("Nepodařilo se načíst amount.json");
       }
+
+      const data = await response.json();
+
+      const raised = Number(data.raised) || 0;
+      const goal = Number(data.goal) || 500000;
+
+      const percentage = Math.min(
+        (raised / goal) * 100,
+        100
+      );
+
+      document.getElementById("amount").textContent =
+        raised.toLocaleString("cs-CZ") + " Kč";
+
+      document.getElementById("goal").textContent =
+        "z cílových " +
+        goal.toLocaleString("cs-CZ") +
+        " Kč";
+
+      document.getElementById("progress").style.width =
+        percentage + "%";
+
+      document.getElementById("percent").textContent =
+        percentage.toLocaleString(
+          "cs-CZ",
+          {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          }
+        ) + " %";
+
+    } catch (error) {
+
+      console.error(
+        "Chyba při načítání částky:",
+        error
+      );
+
     }
+  }
 
-    updateFundraiser();
+  updateFundraiser();
 
-    setInterval(
-      updateFundraiser,
-      60000
-    );
-  </script>
+  setInterval(
+    updateFundraiser,
+    60000
+  );
+</script>
 
 </body>
 </html>
