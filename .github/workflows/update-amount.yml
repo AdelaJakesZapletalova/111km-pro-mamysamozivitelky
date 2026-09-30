@@ -21,7 +21,6 @@ jobs:
         run: |
           import json
           import urllib.request
-          import urllib.error
           from datetime import datetime, timezone
 
           URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
@@ -31,142 +30,57 @@ jobs:
 
           today = datetime.now(timezone.utc).date().isoformat()
 
-          page = 1
-          raised = 0.0
+          payload = {
+              "accountNumber": ACCOUNT,
+              "dateFrom": START_DATE,
+              "dateTo": today,
+              "page": 1
+          }
 
-          while True:
-              payload = {
-                  "accountList": [
-                      {
-                          "accountNumberM24": ACCOUNT
-                      }
-                  ],
-                  "filterList": [
-                      {
-                          "name": "AccountingDate",
-                          "operator": "ge",
-                          "valueList": [START_DATE]
-                      },
-                      {
-                          "name": "AccountingDate",
-                          "operator": "le",
-                          "valueList": [today]
-                      }
-                  ],
-                  "paging": {
-                      "rowsPerPage": 10,
-                      "pageNumber": page
-                  },
-                  "sortList": [
-                      {
-                          "name": "AccountingDate",
-                          "direction": "DESC",
-                          "order": 1
-                      }
-                  ]
-              }
+          data = json.dumps(payload).encode("utf-8")
 
-              data = json.dumps(payload).encode("utf-8")
+          request = urllib.request.Request(
+              URL,
+              data=data,
+              headers={
+                  "Content-Type": "application/json",
+                  "Accept": "application/json",
+                  "User-Agent": "Mozilla/5.0"
+              },
+              method="POST"
+          )
 
-              request = urllib.request.Request(
-                  URL,
-                  data=data,
-                  headers={
-                      "Content-Type": "application/json",
-                      "Accept": "application/json",
-                      "User-Agent": "Mozilla/5.0",
-                      "Origin": "https://www.csob.cz",
-                      "Referer": "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
-                  },
-                  method="POST"
-              )
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  result = json.loads(response.read().decode("utf-8"))
+          except Exception as e:
+              print("Chyba pri nacitani CSOB:", repr(e))
+              raise
 
-              opener = urllib.request.build_opener(
-                  urllib.request.HTTPRedirectHandler()
-              )
+          transactions = result.get("accountedTransaction", [])
 
-              try:
-                  response = opener.open(request, timeout=30)
-              except urllib.error.HTTPError as error:
-                  if error.code == 307:
-                      redirect_url = error.headers.get("Location")
-                      if not redirect_url:
-                          raise
+          raised = 0
 
-                      request = urllib.request.Request(
-                          redirect_url,
-                          data=data,
-                          headers={
-                              "Content-Type": "application/json",
-                              "Accept": "application/json",
-                              "User-Agent": "Mozilla/5.0",
-                              "Origin": "https://www.csob.cz",
-                              "Referer": "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
-                          },
-                          method="POST"
-                      )
+          for transaction in transactions:
+              base = transaction.get("baseInfo", {})
+              amount_data = base.get("accountAmountData", {})
+              amount = float(amount_data.get("amount", 0) or 0)
 
-                      response = urllib.request.urlopen(
-                          request,
-                          timeout=30
-                      )
-                  else:
-                      raise
+              transaction_date = base.get("accountingDate", "")
 
-              result = json.loads(
-                  response.read().decode("utf-8")
-              )
+              if transaction_date[:10] >= START_DATE and amount > 0:
+                  raised += amount
 
-              transactions = result.get(
-                  "accountedTransaction", []
-              )
-
-              for transaction in transactions:
-                  base = transaction.get("baseInfo", {})
-                  amount_data = base.get(
-                      "accountAmountData", {}
-                  )
-
-                  amount = float(
-                      amount_data.get("amount", 0)
-                  )
-
-                  currency = amount_data.get(
-                      "currencyCode"
-                  )
-
-                  if amount > 0 and currency == "CZK":
-                      raised += amount
-
-              paging = result.get("paging", {})
-              page_count = int(
-                  paging.get("pageCount", 1)
-              )
-
-              if page >= page_count:
-                  break
-
-              page += 1
-
-          result = {
+          output = {
               "raised": round(raised, 2),
               "goal": GOAL
           }
 
-          with open(
-              "amount.json",
-              "w",
-              encoding="utf-8"
-          ) as file:
-              json.dump(
-                  result,
-                  file,
-                  ensure_ascii=False,
-                  indent=2
-              )
-              file.write("\n")
+          with open("amount.json", "w", encoding="utf-8") as f:
+              json.dump(output, f, ensure_ascii=False, indent=2)
+              f.write("\n")
 
-          print(result)
+          print("Vysledek:", output)
 
       - name: Ulozit novou castku
         run: |
