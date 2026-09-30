@@ -12,12 +12,11 @@
     content="Adéla běží 111 km Brdami na podporu maminek samoživitelek a jejich dětí."
   >
 
-  <!-- PRVNÍ OBRÁZEK SE ZAČNE STAHOVAT HNED -->
+  <!-- PRVNÍ STRÁNKA SE NAČÍTÁ PŘEDNOSTNĚ -->
   <link
     rel="preload"
     as="image"
-    href="page-1.webp"
-    type="image/webp"
+    href="page-1.png"
     fetchpriority="high"
   >
 
@@ -72,13 +71,11 @@
     .counter {
       position: absolute;
 
-      /* POZICE POČÍTADLA */
       top: calc(15% + 2cm);
       left: calc(50% + 1cm);
 
       width: 31%;
 
-      /* CELÉ POČÍTADLO O 15 % VĚTŠÍ */
       transform: translate(-50%, -50%) scale(1.15);
       transform-origin: center center;
 
@@ -88,8 +85,6 @@
       color: #C68BFF !important;
     }
 
-
-    /* NADPIS */
 
     .counter h2 {
       margin: 0 0 12px 0;
@@ -105,8 +100,6 @@
     }
 
 
-    /* ČÁSTKA */
-
     .counter .amount {
       margin: 0;
       padding: 0;
@@ -118,8 +111,6 @@
       line-height: 1;
     }
 
-
-    /* PROCENTA */
 
     .counter .percentage {
       margin: 14px 0 0 0;
@@ -166,7 +157,7 @@
     }
 
 
-    /* MAPA TRASY */
+    /* MAPA */
 
     .route-map {
       width: 100%;
@@ -177,11 +168,14 @@
 
     .route-map iframe {
       display: block;
+
       width: 100%;
       height: 70vh;
       min-height: 500px;
+
       margin: 0;
       padding: 0;
+
       border: 0;
     }
 
@@ -251,7 +245,7 @@
 
       <img
         class="canva"
-        src="page-1.webp"
+        src="page-1.png"
         alt="Adéla běží 111 km za mámy samoživitelky"
         loading="eager"
         fetchpriority="high"
@@ -268,7 +262,7 @@
 
       <img
         class="canva"
-        src="page-2.webp"
+        src="page-2.png"
         alt="O projektu"
         loading="lazy"
         decoding="async"
@@ -325,7 +319,7 @@
 
       <img
         class="canva"
-        src="page-3.webp"
+        src="page-3.png"
         alt="Proč pomáhat maminkám samoživitelkám"
         loading="lazy"
         decoding="async"
@@ -341,7 +335,7 @@
 
       <img
         class="canva"
-        src="page-4.webp"
+        src="page-4.png"
         alt="Nadační fond Mámy v kaši"
         loading="lazy"
         decoding="async"
@@ -351,7 +345,7 @@
 
 
 
-    <!-- MAPA TRASY -->
+    <!-- MAPA ÚPLNĚ DOLE -->
 
     <section
       class="route-map"
@@ -502,7 +496,7 @@
     updateAmount();
 
 
-    /* WEB KONTROLUJE NOVOU ČÁSTKU KAŽDOU MINUTU */
+    /* KONTROLA NOVÉ ČÁSTKY KAŽDOU MINUTU */
 
     setInterval(
       updateAmount,
