@@ -52,7 +52,7 @@
     .counter {
       position: absolute;
 
-      /* Tuhle pozici necháváme */
+      /* POZICI NECHÁVÁME */
       top: 6%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -76,53 +76,51 @@
       line-height: 1;
     }
 
-    /* PROCENTA */
+    /* PROCENTA A CÍL */
     .percentage {
-      margin-top: 10px;
-      font-size: clamp(15px, 1.7vw, 24px);
+      margin-top: 14px;
+      font-size: clamp(14px, 1.5vw, 21px);
       font-weight: 700;
     }
 
     /* PROGRESS BAR */
     .progress {
       position: relative;
-      width: 100%;
-      height: clamp(18px, 2.2vw, 32px);
+      display: block;
 
-      margin: 10px auto 0;
+      width: 100%;
+      height: 28px;
+
+      margin: 12px auto 0;
 
       border: 3px solid #111;
-      background: #fff;
+      background: rgba(255,255,255,0.95);
 
       overflow: hidden;
     }
 
     .progress-fill {
-      width: 0%;
+      position: absolute;
+      top: 0;
+      left: 0;
+
       height: 100%;
+      width: 0%;
 
       background:
         repeating-linear-gradient(
           -45deg,
-          #111 0,
-          #111 10px,
-          #444 10px,
-          #444 20px
+          #111 0px,
+          #111 12px,
+          #555 12px,
+          #555 24px
         );
 
       transition: width 0.8s ease;
     }
 
-    /* CÍLOVÁ ČÁSTKA */
-    .goal-text {
-      margin-top: 7px;
-      text-align: right;
-
-      font-size: clamp(12px, 1.2vw, 17px);
-      font-weight: 600;
-    }
-
     @media (max-width: 700px) {
+
       .counter {
         width: 72%;
       }
@@ -136,22 +134,19 @@
       }
 
       .percentage {
-        margin-top: 6px;
-        font-size: 14px;
+        margin-top: 8px;
+        font-size: 13px;
       }
 
       .progress {
-        margin-top: 6px;
+        height: 18px;
+        margin-top: 8px;
         border-width: 2px;
-      }
-
-      .goal-text {
-        margin-top: 4px;
-        font-size: 11px;
       }
     }
 
     @media (min-width: 1500px) {
+
       main {
         max-width: 1800px;
         margin: auto;
@@ -202,7 +197,7 @@
           class="percentage"
           id="percentage"
         >
-          0 %
+          0 % z cílových 500 000 Kč
         </div>
 
         <div
@@ -213,13 +208,6 @@
             class="progress-fill"
             id="progress-fill"
           ></div>
-        </div>
-
-        <div
-          class="goal-text"
-          id="goal-text"
-        >
-          z cílových 500 000 Kč
         </div>
 
       </section>
@@ -317,10 +305,20 @@
         }
 
 
+        /* PROCENTA + CÍL */
+
         document.getElementById(
           "percentage"
         ).textContent =
-          percentageText + " %";
+          percentageText +
+          " % z cílových " +
+          new Intl.NumberFormat(
+            "cs-CZ",
+            {
+              maximumFractionDigits: 0
+            }
+          ).format(goal) +
+          " Kč";
 
 
         /* PROGRESS BAR */
@@ -338,21 +336,6 @@
           barPercentage + "%";
 
 
-        /* CÍL */
-
-        document.getElementById(
-          "goal-text"
-        ).textContent =
-          "z cílových " +
-          new Intl.NumberFormat(
-            "cs-CZ",
-            {
-              maximumFractionDigits: 0
-            }
-          ).format(goal)
-          + " Kč";
-
-
       } catch (error) {
 
         console.error(error);
@@ -363,10 +346,6 @@
 
         document.getElementById(
           "percentage"
-        ).textContent = "";
-
-        document.getElementById(
-          "goal-text"
         ).textContent =
           "Cíl 500 000 Kč";
 
@@ -375,11 +354,9 @@
     }
 
 
-    /* načíst ihned */
     updateAmount();
 
-
-    /* obnovovat každou minutu */
+    /* aktualizace každou minutu */
     setInterval(
       updateAmount,
       60000
