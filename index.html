@@ -15,7 +15,7 @@
   <link
     rel="preload"
     as="image"
-    href="page-1 (1).png"
+    href="page-1.png"
     fetchpriority="high"
   >
 
@@ -347,7 +347,6 @@
       .donate-button {
         right: 14px;
         bottom: 14px;
-
         padding: 13px 20px;
         font-size: 14px;
       }
@@ -355,7 +354,6 @@
       .mamy-button {
         left: 14px;
         bottom: 14px;
-
         padding: 13px 20px;
         font-size: 14px;
       }
@@ -418,7 +416,7 @@
 
       <img
         class="canva"
-        src="page-1 (1).png"
+        src="page-1.png"
         alt="Adéla běží 111 km za mámy samoživitelky"
         loading="eager"
         fetchpriority="high"
@@ -434,7 +432,7 @@
 
       <img
         class="canva"
-        src="page-2 (1).png"
+        src="page-2.png"
         alt="O projektu"
         loading="lazy"
         fetchpriority="low"
@@ -500,7 +498,7 @@
       <img
         class="canva"
         id="page-three-image"
-        src="page-3 (1).png"
+        src="page-3.png"
         alt="Proč pomáhat maminkám samoživitelkám"
         loading="lazy"
         fetchpriority="low"
@@ -516,7 +514,7 @@
 
       <img
         class="canva"
-        src="page-4 (1).png"
+        src="page-4.png"
         alt="Nadační fond Mámy v kaši"
         loading="lazy"
         fetchpriority="low"
@@ -559,20 +557,8 @@
       const imageTop =
         window.scrollY + imageRect.top;
 
-
-      /*
-        QR je ve finální verzi přibližně
-        v 84 % výšky stránky 3.
-      */
-
       const qrPosition =
         imageTop + (imageRect.height * 0.84);
-
-
-      /*
-        QR se po doskoku zobrazí přibližně
-        ve 40 % výšky obrazovky.
-      */
 
       const targetScroll =
         qrPosition - (window.innerHeight * 0.40);
