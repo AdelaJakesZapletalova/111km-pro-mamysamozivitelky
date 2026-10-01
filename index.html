@@ -73,7 +73,9 @@
     }
 
 
-    /* POČÍTADLO */
+    /* =========================
+       POČÍTADLO
+       ========================= */
 
     .counter {
       position: absolute;
@@ -183,7 +185,9 @@
     }
 
 
-    /* CHCI PŘISPĚT */
+    /* =========================
+       CHCI PŘISPĚT
+       ========================= */
 
     .donate-button {
       position: fixed;
@@ -225,7 +229,9 @@
     }
 
 
-    /* WEB NADAČNÍHO FONDU */
+    /* =========================
+       WEB NADAČNÍHO FONDU
+       ========================= */
 
     .mamy-button {
       position: fixed;
@@ -267,7 +273,9 @@
     }
 
 
-    /* MAPA */
+    /* =========================
+       MAPA
+       ========================= */
 
     .route-map {
       width: 100%;
@@ -296,7 +304,9 @@
     }
 
 
-    /* MOBIL */
+    /* =========================
+       MOBIL
+       ========================= */
 
     @media (max-width: 700px) {
 
@@ -530,9 +540,9 @@
 
   <script>
 
-    /* =========================================
+    /* =========================
        CHCI PŘISPĚT
-       ========================================= */
+       ========================= */
 
     const donateButton =
       document.getElementById("donate-button");
@@ -549,16 +559,30 @@
       const imageTop =
         window.scrollY + imageRect.top;
 
+
+      /*
+        QR je ve finální verzi přibližně
+        v 84 % výšky stránky 3.
+      */
+
       const qrPosition =
-        imageTop + (imageRect.height * 0.81);
+        imageTop + (imageRect.height * 0.84);
+
+
+      /*
+        QR se po doskoku zobrazí přibližně
+        ve 40 % výšky obrazovky.
+      */
 
       const targetScroll =
-        qrPosition - (window.innerHeight * 0.30);
+        qrPosition - (window.innerHeight * 0.40);
+
 
       window.scrollTo({
         top: targetScroll,
         behavior: "smooth"
       });
+
 
       history.replaceState(
         null,
@@ -574,6 +598,7 @@
       function(event) {
 
         event.preventDefault();
+
 
         if (
           pageThreeImage.complete &&
@@ -592,6 +617,7 @@
             }
           );
 
+
           pageThreeImage.scrollIntoView({
             behavior: "auto",
             block: "center"
@@ -603,9 +629,9 @@
     );
 
 
-    /* =========================================
-       MAPA - ODLOŽENÉ NAČÍTÁNÍ
-       ========================================= */
+    /* =========================
+       MAPA
+       ========================= */
 
     const routeMap =
       document.getElementById("route-map");
@@ -621,20 +647,26 @@
 
       mapLoaded = true;
 
+
       const iframe =
         document.createElement("iframe");
+
 
       iframe.src =
         "https://mapy.com/s/fomobopetu";
 
+
       iframe.title =
         "Trasa 111 km Brdami";
+
 
       iframe.loading =
         "lazy";
 
+
       iframe.allowFullscreen =
         true;
+
 
       routeMap.appendChild(iframe);
 
@@ -654,6 +686,7 @@
                 if (entry.isIntersecting) {
 
                   loadMap();
+
                   observer.disconnect();
 
                 }
@@ -669,6 +702,7 @@
 
         );
 
+
       mapObserver.observe(routeMap);
 
     } else {
@@ -678,9 +712,9 @@
     }
 
 
-    /* =========================================
+    /* =========================
        POČÍTADLO
-       ========================================= */
+       ========================= */
 
     async function updateAmount() {
 
@@ -694,6 +728,7 @@
             }
           );
 
+
         if (!response.ok) {
 
           throw new Error(
@@ -702,11 +737,14 @@
 
         }
 
+
         const data =
           await response.json();
 
+
         const raised =
           Number(data.raised) || 0;
+
 
         const goal =
           Number(data.goal) || 500000;
@@ -731,6 +769,7 @@
           goal > 0
             ? (raised / goal) * 100
             : 0;
+
 
         let percentageText;
 
@@ -775,6 +814,7 @@
             100
           );
 
+
         const visibleBarPercentage =
           realBarPercentage > 0
             ? Math.max(
@@ -797,10 +837,12 @@
           error
         );
 
+
         document
           .getElementById("amount")
           .textContent =
             "— Kč";
+
 
         document
           .getElementById("percentage")
@@ -813,6 +855,7 @@
 
 
     updateAmount();
+
 
     setInterval(
       updateAmount,
