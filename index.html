@@ -469,7 +469,7 @@
     </div>
 
 
-    <!-- STRÁNKA 3 - NOVÁ VERZE S NOVÝM QR KÓDEM -->
+    <!-- STRÁNKA 3 - OPRAVENÁ VERZE -->
 
     <div
       class="page page-three"
@@ -479,7 +479,7 @@
       <img
         class="canva"
         id="page-three-image"
-        src="page-3-new.png"
+        src="page-3-new-v2.png"
         alt="Proč pomáhat maminkám samoživitelkám a jak přispět"
         loading="lazy"
         fetchpriority="low"
@@ -717,8 +717,6 @@
           Number(data.goal) || 500000;
 
 
-        /* ČÁSTKA */
-
         document
           .getElementById("amount")
           .textContent =
@@ -729,8 +727,6 @@
               }
             ) + " Kč";
 
-
-        /* PROCENTA */
 
         const percentage =
           goal > 0
@@ -772,8 +768,6 @@
             + goal.toLocaleString("cs-CZ")
             + " Kč";
 
-
-        /* PROGRESS BAR */
 
         const realBarPercentage =
           Math.min(
