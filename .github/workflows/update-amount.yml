@@ -1,4 +1,4 @@
-name: Zjistit zustatek CSOB
+name: Najit aktualni zustatek CSOB
 
 on:
   workflow_dispatch:
@@ -11,51 +11,93 @@ jobs:
       - name: Nainstalovat requests
         run: python -m pip install requests
 
-      - name: Zjistit data z CSOB
+      - name: Najit zustatek
         shell: python
         run: |
           import json
+          import re
           import requests
-          from datetime import datetime, timezone
 
           PAGE_URL = "https://www.csob.cz/firmy/bezne-ucty/transparentni-ucty/ucet?account=377658515"
           API_URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
-
           ACCOUNT = 377658515
 
           session = requests.Session()
 
-          browser_headers = {
+          headers = {
               "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
               "Accept-Language": "cs-CZ,cs;q=0.9"
           }
 
-          print("1. Oteviram verejnou stranku CSOB...")
+          print("Oteviram stranku CSOB...")
 
-          page_response = session.get(
+          page = session.get(
               PAGE_URL,
-              headers=browser_headers,
-              timeout=30,
-              allow_redirects=True
+              headers=headers,
+              timeout=30
           )
 
-          page_response.raise_for_status()
+          page.raise_for_status()
 
-          print("Stranka CSOB otevrena.")
-          print("HTTP:", page_response.status_code)
-          print("Cookies:", session.cookies.get_dict())
+          print("HTTP:", page.status_code)
+
+          # -------------------------------------------------
+          # 1. Zkusime najit zustatek primo v HTML
+          # -------------------------------------------------
+
+          html = page.text
+
+          print("")
+          print("=== HLEDANI V HTML ===")
+
+          for needle in [
+              "24575",
+              "24 575",
+              "accountBalance",
+              "balance",
+              "Aktuální zůstatek",
+              "Aktualni zustatek"
+          ]:
+              print(
+                  needle,
+                  "=>",
+                  needle.lower() in html.lower()
+              )
+
+          # -------------------------------------------------
+          # 2. Vypiseme URL/endpointy nalezene ve strance
+          # -------------------------------------------------
+
+          print("")
+          print("=== MOZNE API ENDPOINTY ===")
+
+          urls = sorted(
+              set(
+                  re.findall(
+                      r'["\']([^"\']*(?:api|spa|finance|account|balance)[^"\']*)["\']',
+                      html,
+                      flags=re.IGNORECASE
+                  )
+              )
+          )
+
+          for url in urls:
+              if len(url) < 500:
+                  print(url)
+
+          # -------------------------------------------------
+          # 3. Zavolame zname transakcni API
+          # -------------------------------------------------
 
           api_headers = {
               "Accept": "application/json, text/plain, */*",
               "Content-Type": "application/json",
-              "User-Agent": browser_headers["User-Agent"],
-              "Accept-Language": "cs-CZ,cs;q=0.9",
+              "User-Agent": headers["User-Agent"],
+              "Accept-Language": headers["Accept-Language"],
               "Origin": "https://www.csob.cz",
               "Referer": PAGE_URL,
               "X-Security-Request": "required"
           }
-
-          today = datetime.now(timezone.utc).date().isoformat()
 
           payload = {
               "accountList": [
@@ -63,15 +105,9 @@ jobs:
                       "accountNumberM24": ACCOUNT
                   }
               ],
-              "filterList": [
-                  {
-                      "name": "AccountingDate",
-                      "operator": "le",
-                      "valueList": [today]
-                  }
-              ],
+              "filterList": [],
               "paging": {
-                  "rowsPerPage": 10,
+                  "rowsPerPage": 100,
                   "pageNumber": 1
               },
               "sortList": [
@@ -84,96 +120,116 @@ jobs:
           }
 
           print("")
-          print("2. Volam API CSOB...")
+          print("=== TRANSAKCNI API ===")
 
           response = session.post(
               API_URL,
               json=payload,
               headers=api_headers,
-              timeout=30,
-              allow_redirects=True
+              timeout=30
           )
 
           response.raise_for_status()
 
-          print("API odpovedelo.")
-          print("HTTP:", response.status_code)
+          data = response.json()
 
-          result = response.json()
-
-          print("")
-          print("========================================")
-          print("KOMPLETNI ODPOVED CSOB")
-          print("========================================")
+          transactions = data.get(
+              "accountedTransaction",
+              []
+          )
 
           print(
-              json.dumps(
-                  result,
-                  ensure_ascii=False,
-                  indent=2
-              )
+              "Pocet vracenych transakci:",
+              len(transactions)
           )
 
           print("")
-          print("========================================")
-          print("HLEDAM HODNOTU 24575")
-          print("========================================")
+          print("=== VSECHNY ACCOUNT BALANCE ===")
 
-          def search_value(obj, path="root"):
+          for i, transaction in enumerate(
+              transactions,
+              start=1
+          ):
+              base = transaction.get(
+                  "baseInfo",
+                  {}
+              )
 
-              if isinstance(obj, dict):
+              print(
+                  i,
+                  "| datum:",
+                  base.get("accountingDate"),
+                  "| castka:",
+                  base.get(
+                      "accountAmountData",
+                      {}
+                  ).get("amount"),
+                  "| balance:",
+                  base.get("accountBalance"),
+                  "| order:",
+                  base.get("accountingOrder")
+              )
 
-                  for key, value in obj.items():
+          # -------------------------------------------------
+          # 4. Hledame nejvyssi accountingOrder
+          # -------------------------------------------------
 
-                      new_path = f"{path}.{key}"
+          valid = []
 
-                      if "balance" in str(key).lower():
-                          print(
-                              "POLE SE SLOVEM BALANCE:",
-                              new_path,
-                              "=",
-                              value
-                          )
+          for transaction in transactions:
 
-                      if "zust" in str(key).lower():
-                          print(
-                              "POLE SE SLOVEM ZUST:",
-                              new_path,
-                              "=",
-                              value
-                          )
+              base = transaction.get(
+                  "baseInfo",
+                  {}
+              )
 
-                      if str(value) in [
-                          "24575",
-                          "24575.0",
-                          "24575.00",
-                          "24 575",
-                          "24 575.00"
-                      ]:
-                          print(
-                              "NALEZENA HODNOTA 24575:",
-                              new_path,
-                              "=",
-                              value
-                          )
+              balance = base.get(
+                  "accountBalance"
+              )
 
-                      search_value(
-                          value,
-                          new_path
+              order = base.get(
+                  "accountingOrder"
+              )
+
+              if (
+                  balance is not None
+                  and order is not None
+              ):
+                  valid.append(base)
+
+          if valid:
+
+              newest = max(
+                  valid,
+                  key=lambda x: int(
+                      x.get(
+                          "accountingOrder",
+                          0
                       )
+                  )
+              )
 
-              elif isinstance(obj, list):
+              print("")
+              print("==============================")
+              print("NEJVYSSI ACCOUNTING ORDER")
+              print("==============================")
 
-                  for index, value in enumerate(obj):
+              print(
+                  json.dumps(
+                      newest,
+                      ensure_ascii=False,
+                      indent=2
+                  )
+              )
 
-                      search_value(
-                          value,
-                          f"{path}[{index}]"
-                      )
+              print("")
+              print(
+                  "ZUSTATEK:",
+                  newest.get("accountBalance")
+              )
 
-          search_value(result)
+          else:
 
-          print("")
-          print("========================================")
-          print("DIAGNOSTIKA HOTOVA")
-          print("========================================")
+              print(
+                  "Nenasel jsem zadny accountBalance."
+              )
