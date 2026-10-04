@@ -1,25 +1,17 @@
-name: Aktualizovat vybranou castku
+name: Zjistit zustatek CSOB
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/5 * * * *"
-
-permissions:
-  contents: write
 
 jobs:
-  update:
+  diagnostika:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Stahnout repozitar
-        uses: actions/checkout@v4
-
       - name: Nainstalovat requests
         run: python -m pip install requests
 
-      - name: Spocitat prijate dary
+      - name: Zjistit data z CSOB
         shell: python
         run: |
           import json
@@ -30,10 +22,6 @@ jobs:
           API_URL = "https://www.csob.cz/spa/finance/lta/detail/transactions"
 
           ACCOUNT = 377658515
-          START_DATE = "2026-09-30"
-          GOAL = 500000
-
-          today = datetime.now(timezone.utc).date().isoformat()
 
           session = requests.Session()
 
@@ -41,6 +29,8 @@ jobs:
               "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
               "Accept-Language": "cs-CZ,cs;q=0.9"
           }
+
+          print("1. Oteviram verejnou stranku CSOB...")
 
           page_response = session.get(
               PAGE_URL,
@@ -50,6 +40,10 @@ jobs:
           )
 
           page_response.raise_for_status()
+
+          print("Stranka CSOB otevrena.")
+          print("HTTP:", page_response.status_code)
+          print("Cookies:", session.cookies.get_dict())
 
           api_headers = {
               "Accept": "application/json, text/plain, */*",
@@ -61,115 +55,125 @@ jobs:
               "X-Security-Request": "required"
           }
 
-          raised = 0.0
-          page = 1
+          today = datetime.now(timezone.utc).date().isoformat()
 
-          while True:
-              payload = {
-                  "accountList": [
-                      {
-                          "accountNumberM24": ACCOUNT
-                      }
-                  ],
-                  "filterList": [
-                      {
-                          "name": "AccountingDate",
-                          "operator": "ge",
-                          "valueList": [START_DATE]
-                      },
-                      {
-                          "name": "AccountingDate",
-                          "operator": "le",
-                          "valueList": [today]
-                      }
-                  ],
-                  "paging": {
-                      "rowsPerPage": 100,
-                      "pageNumber": page
-                  },
-                  "sortList": [
-                      {
-                          "name": "AccountingDate",
-                          "direction": "DESC",
-                          "order": 1
-                      }
-                  ]
-              }
-
-              response = session.post(
-                  API_URL,
-                  json=payload,
-                  headers=api_headers,
-                  timeout=30,
-                  allow_redirects=True
-              )
-
-              response.raise_for_status()
-              result = response.json()
-
-              transactions = result.get(
-                  "accountedTransaction",
-                  []
-              )
-
-              for transaction in transactions:
-                  base_info = transaction.get("baseInfo", {})
-
-                  amount_data = base_info.get(
-                      "accountAmountData",
-                      {}
-                  )
-
-                  amount = float(
-                      amount_data.get("amount", 0) or 0
-                  )
-
-                  currency = amount_data.get("currencyCode")
-
-                  if amount > 0 and currency == "CZK":
-                      raised += amount
-
-              paging = result.get("paging", {})
-
-              page_count = int(
-                  paging.get("pageCount", 1) or 1
-              )
-
-              if page >= page_count:
-                  break
-
-              page += 1
-
-          output = {
-              "raised": round(raised, 2),
-              "goal": GOAL
+          payload = {
+              "accountList": [
+                  {
+                      "accountNumberM24": ACCOUNT
+                  }
+              ],
+              "filterList": [
+                  {
+                      "name": "AccountingDate",
+                      "operator": "le",
+                      "valueList": [today]
+                  }
+              ],
+              "paging": {
+                  "rowsPerPage": 10,
+                  "pageNumber": 1
+              },
+              "sortList": [
+                  {
+                      "name": "AccountingDate",
+                      "direction": "DESC",
+                      "order": 1
+                  }
+              ]
           }
 
-          with open(
-              "amount.json",
-              "w",
-              encoding="utf-8"
-          ) as file:
-              json.dump(
-                  output,
-                  file,
+          print("")
+          print("2. Volam API CSOB...")
+
+          response = session.post(
+              API_URL,
+              json=payload,
+              headers=api_headers,
+              timeout=30,
+              allow_redirects=True
+          )
+
+          response.raise_for_status()
+
+          print("API odpovedelo.")
+          print("HTTP:", response.status_code)
+
+          result = response.json()
+
+          print("")
+          print("========================================")
+          print("KOMPLETNI ODPOVED CSOB")
+          print("========================================")
+
+          print(
+              json.dumps(
+                  result,
                   ensure_ascii=False,
                   indent=2
               )
-              file.write("\n")
+          )
 
-          print("HOTOVO:", output)
+          print("")
+          print("========================================")
+          print("HLEDAM HODNOTU 24575")
+          print("========================================")
 
-      - name: Ulozit novou castku
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          def search_value(obj, path="root"):
 
-          git add amount.json
+              if isinstance(obj, dict):
 
-          if git diff --cached --quiet; then
-            echo "Castka se nezmenila."
-          else
-            git commit -m "Aktualizace vybrane castky"
-            git push
-          fi
+                  for key, value in obj.items():
+
+                      new_path = f"{path}.{key}"
+
+                      if "balance" in str(key).lower():
+                          print(
+                              "POLE SE SLOVEM BALANCE:",
+                              new_path,
+                              "=",
+                              value
+                          )
+
+                      if "zust" in str(key).lower():
+                          print(
+                              "POLE SE SLOVEM ZUST:",
+                              new_path,
+                              "=",
+                              value
+                          )
+
+                      if str(value) in [
+                          "24575",
+                          "24575.0",
+                          "24575.00",
+                          "24 575",
+                          "24 575.00"
+                      ]:
+                          print(
+                              "NALEZENA HODNOTA 24575:",
+                              new_path,
+                              "=",
+                              value
+                          )
+
+                      search_value(
+                          value,
+                          new_path
+                      )
+
+              elif isinstance(obj, list):
+
+                  for index, value in enumerate(obj):
+
+                      search_value(
+                          value,
+                          f"{path}[{index}]"
+                      )
+
+          search_value(result)
+
+          print("")
+          print("========================================")
+          print("DIAGNOSTIKA HOTOVA")
+          print("========================================")
